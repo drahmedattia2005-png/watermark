@@ -7,6 +7,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 :root{
@@ -96,6 +97,7 @@ label.field{
 
 input[type=text],
 input[type=tel],
+input[type=file],
 select{
   width:100%;
   padding:13px 14px;
@@ -218,6 +220,7 @@ select:focus{
   padding:8px;
 }
 
+
 .btn:disabled{
   opacity:.55;
   cursor:not-allowed;
@@ -313,7 +316,7 @@ select:focus{
 }
 
 #watermarkOverlay{
-  color:rgba(140,140,140,.58);
+  color:rgba(140,140,140,.50);
   line-height:1;
   cursor:grab;
   touch-action:none;
@@ -325,21 +328,15 @@ select:focus{
 }
 
 #footerOverlay{
-  color:rgba(15,15,15,.85);
-  line-height:1.15;
-  text-align:right;
   cursor:grab;
   touch-action:none;
-  padding:8px 10px;
-  margin:-8px -10px;
 }
 
-.footer-name-preview{
-  font-weight:700;
-}
-
-.footer-phone-preview{
-  font-weight:400;
+#footerImagePreview{
+  display:block;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
 }
 
 .preview-element.selected{
@@ -454,6 +451,10 @@ select:focus{
 .hidden{
   display:none!important;
 }
+
+#previewCanvasWrap.export-capture .preview-element.selected{
+  outline:none!important;
+}
 </style>
 </head>
 
@@ -515,25 +516,23 @@ select:focus{
 
   </select>
 
-  <label class="field" for="footerName">
-    Full name
+  <label class="field" for="footerImageInput">
+    Footer image <span style="color:var(--ink-soft)">(optional)</span>
   </label>
 
   <input
-    type="text"
-    id="footerName"
-    placeholder="Enter your full name"
+    type="file"
+    id="footerImageInput"
+    accept="image/png,image/jpeg,image/webp"
   >
 
-  <label class="field" for="footerPhone">
-    Phone number
-  </label>
-
-  <input
-    type="tel"
-    id="footerPhone"
-    placeholder="Enter your phone number"
+  <button
+    class="link-btn"
+    id="clearFooterImageBtn"
+    type="button"
   >
+    Remove footer image
+  </button>
 
   <button
     class="btn btn-primary"
@@ -688,15 +687,10 @@ select:focus{
           class="preview-element"
         >
 
-          <div
-            class="footer-name-preview"
-            id="footerNamePreview"
-          ></div>
-
-          <div
-            class="footer-phone-preview"
-            id="footerPhonePreview"
-          ></div>
+          <img
+            id="footerImagePreview"
+            alt="Footer image preview"
+          >
 
         </div>
 
@@ -929,11 +923,8 @@ const watermarkOverlay =
 const footerOverlay =
   document.getElementById("footerOverlay");
 
-const footerNamePreview =
-  document.getElementById("footerNamePreview");
-
-const footerPhonePreview =
-  document.getElementById("footerPhonePreview");
+const footerImagePreview =
+  document.getElementById("footerImagePreview");
 
 const previewCanvasContainer =
   document.getElementById(
@@ -996,14 +987,14 @@ const watermarkFontInput =
     "watermarkFont"
   );
 
-const footerNameInput =
+const footerImageInput =
   document.getElementById(
-    "footerName"
+    "footerImageInput"
   );
 
-const footerPhoneInput =
+const clearFooterImageBtn =
   document.getElementById(
-    "footerPhone"
+    "clearFooterImageBtn"
   );
 
 const saveSettingsBtn =
@@ -1028,11 +1019,22 @@ const FORMAT_STORAGE_KEY =
   "watermark-format";
 
 
+function showUpload(){
+
+  uploadZone.classList.remove(
+    "hidden"
+  );
+
+}
+
+
 /* =====================================================
    STATE
 ===================================================== */
 
 let settings = null;
+
+let pendingFooterImageData = null;
 
 let originalPdfBytes = null;
 
@@ -1327,23 +1329,16 @@ function saveDetails(){
     watermarkFont:
       watermarkFontInput.value,
 
-    footerName:
-      footerNameInput.value.trim(),
-
-    footerPhone:
-      footerPhoneInput.value.trim()
+    footerImage:
+      pendingFooterImageData
 
   };
 
 
-  if(
-    !data.wmText ||
-    !data.footerName ||
-    !data.footerPhone
-  ){
+  if(!data.wmText){
 
     showError(
-      "Please fill in all three fields."
+      "Please enter watermark text."
     );
 
     return;
@@ -1375,16 +1370,7 @@ function saveDetails(){
   clearError();
 
 
-  document.getElementById(
-    "summaryName"
-  ).textContent =
-    settings.footerName;
-
-
-  document.getElementById(
-    "summaryPhone"
-  ).textContent =
-    settings.footerPhone;
+  updateDetailsSummary();
 
 
   setupCard.classList.add(
@@ -1425,9 +1411,7 @@ function loadDetails(){
 
     if(
       !data ||
-      !data.wmText ||
-      !data.footerName ||
-      !data.footerPhone
+      !data.wmText
     ){
 
       return;
@@ -1444,11 +1428,10 @@ function loadDetails(){
         data.watermarkFont ||
         "TimesRomanItalic",
 
-      footerName:
-        String(data.footerName),
-
-      footerPhone:
-        String(data.footerPhone)
+      footerImage:
+        typeof data.footerImage === "string"
+          ? data.footerImage
+          : null
 
     };
 
@@ -1459,23 +1442,10 @@ function loadDetails(){
     watermarkFontInput.value =
       settings.watermarkFont;
 
-    footerNameInput.value =
-      settings.footerName;
+    pendingFooterImageData =
+      settings.footerImage;
 
-    footerPhoneInput.value =
-      settings.footerPhone;
-
-
-    document.getElementById(
-      "summaryName"
-    ).textContent =
-      settings.footerName;
-
-
-    document.getElementById(
-      "summaryPhone"
-    ).textContent =
-      settings.footerPhone;
+    updateDetailsSummary();
 
 
     setupCard.classList.add(
@@ -1506,6 +1476,75 @@ function loadDetails(){
 saveSettingsBtn.addEventListener(
   "click",
   saveDetails
+);
+
+
+footerImageInput.addEventListener(
+  "change",
+  () => {
+
+    const image =
+      footerImageInput.files?.[0];
+
+
+    if(!image){
+
+      return;
+
+    }
+
+
+    if(image.size > 2 * 1024 * 1024){
+
+      footerImageInput.value = "";
+
+      showError(
+        "Please choose a footer image smaller than 2 MB."
+      );
+
+      return;
+
+    }
+
+
+    const reader =
+      new FileReader();
+
+
+    reader.addEventListener(
+      "load",
+      () => {
+
+        pendingFooterImageData =
+          String(reader.result);
+
+        clearError();
+
+      }
+    );
+
+
+    reader.readAsDataURL(
+      image
+    );
+
+  }
+);
+
+
+clearFooterImageBtn.addEventListener(
+  "click",
+  () => {
+
+    pendingFooterImageData =
+      null;
+
+    footerImageInput.value =
+      "";
+
+    clearError();
+
+  }
 );
 
 
@@ -1702,7 +1741,6 @@ async function handleFile(file){
 
   clearError();
 
-
   uploadZone.classList.add(
     "hidden"
   );
@@ -1845,6 +1883,19 @@ function waitFrames(){
 
     }
   );
+
+}
+
+
+function updateDetailsSummary(){
+
+  document.getElementById("summaryName").textContent =
+    "Watermark: " + settings.wmText;
+
+  document.getElementById("summaryPhone").textContent =
+    settings.footerImage
+      ? "Footer image saved"
+      : "No footer image";
 
 }
 
@@ -2172,43 +2223,29 @@ function updateFooterPreview(){
     height;
 
 
+  if(!settings.footerImage){
+
+    footerOverlay.style.display =
+      "none";
+
+    return;
+
+  }
+
+
   const shortest =
-    Math.min(
-      width,
-      height
-    );
+    Math.min(width, height);
 
 
-  const nameSize =
+  footerImagePreview.src =
+    settings.footerImage;
+
+
+  footerImagePreview.style.width =
     Math.max(
-      8,
-      shortest *
-      0.028 *
-      footer.scale
-    );
-
-
-  const phoneSize =
-    nameSize *
-    0.82;
-
-
-  footerNamePreview.textContent =
-    settings.footerName;
-
-
-  footerPhonePreview.textContent =
-    settings.footerPhone;
-
-
-  footerNamePreview.style.fontSize =
-    nameSize +
-    "px";
-
-
-  footerPhonePreview.style.fontSize =
-    phoneSize +
-    "px";
+      36,
+      shortest * 0.18 * footer.scale
+    ) + "px";
 
 
   footerOverlay.style.left =
@@ -3230,6 +3267,52 @@ function drawCenteredWatermark(
 }
 
 
+async function createEditorOverlayPng(){
+
+  if(typeof html2canvas !== "function"){
+
+    throw new Error(
+      "The preview export renderer is unavailable."
+    );
+
+  }
+
+
+  previewCanvasWrap.classList.add(
+    "export-capture"
+  );
+
+
+  try{
+
+    const overlayCanvas =
+      await html2canvas(
+        previewCanvasWrap,
+        {
+          backgroundColor:null,
+          scale:2,
+          ignoreElements:element =>
+            element.id ===
+            "pdfPreviewCanvas"
+        }
+      );
+
+
+    return overlayCanvas.toDataURL(
+      "image/png"
+    );
+
+  }finally{
+
+    previewCanvasWrap.classList.remove(
+      "export-capture"
+    );
+
+  }
+
+}
+
+
 /* =====================================================
    STAMP PDF
 ===================================================== */
@@ -3243,6 +3326,44 @@ async function stampPdf(
     await PDFDocument.load(
       bytes
     );
+
+
+  /* Capture the same browser-rendered editor overlay used in the preview.
+     The source PDF remains vector/selectable; only the added marks are a
+     transparent image layer, preserving the preview's font and opacity. */
+  const overlayPng =
+    await createEditorOverlayPng();
+
+
+  const overlayImage =
+    await pdfDoc.embedPng(
+      overlayPng
+    );
+
+
+  for(const page of pdfDoc.getPages()){
+
+    const {
+      width,
+      height
+    } =
+      page.getSize();
+
+
+    page.drawImage(
+      overlayImage,
+      {
+        x:0,
+        y:0,
+        width:width,
+        height:height
+      }
+    );
+
+  }
+
+
+  return pdfDoc.save();
 
 
   const watermarkFont =
@@ -4103,9 +4224,7 @@ window.addEventListener(
 ===================================================== */
 
 [
-  wmTextInput,
-  footerNameInput,
-  footerPhoneInput
+  wmTextInput
 ].forEach(
   input => {
 
