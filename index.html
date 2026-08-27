@@ -334,9 +334,12 @@ select:focus{
 
 #footerImagePreview{
   display:block;
-  max-width:100%;
-  max-height:100%;
+  width:100%;
+  height:auto;
   object-fit:contain;
+  border:0;
+  outline:0;
+  box-shadow:none;
 }
 
 .preview-element.selected{
@@ -797,7 +800,7 @@ select:focus{
     id="applyBtn"
     type="button"
   >
-    Apply Changes
+    Download PDF
   </button>
 
 
@@ -1051,6 +1054,8 @@ let previewBaseViewport = null;
 
 let processing = false;
 
+let hasUnsavedChanges = false;
+
 let selectedElement =
   "watermark";
 
@@ -1074,7 +1079,7 @@ let footer = {
   x:0.94,
   y:0.075,
 
-  scale:1,
+  scale:1.35,
 
   rotation:0
 
@@ -1190,7 +1195,7 @@ function loadFormat(){
 
     x:0.94,
     y:0.075,
-    scale:1,
+    scale:1.35,
     rotation:0
 
   };
@@ -1448,6 +1453,43 @@ function loadDetails(){
     updateDetailsSummary();
 
 
+    if(settings.footerImage){
+
+      removeFooterImageFrame(
+        settings.footerImage
+      ).then(
+        cleanedImage => {
+
+          settings.footerImage =
+            cleanedImage;
+
+          pendingFooterImageData =
+            cleanedImage;
+
+          try{
+
+            localStorage.setItem(
+              DETAILS_STORAGE_KEY,
+              JSON.stringify(settings)
+            );
+
+          }catch(error){}
+
+
+          if(originalPdfBytes){
+
+            updateFooterPreview();
+
+          }
+
+        }
+      ).catch(
+        () => {}
+      );
+
+    }
+
+
     setupCard.classList.add(
       "hidden"
     );
@@ -1477,6 +1519,102 @@ saveSettingsBtn.addEventListener(
   "click",
   saveDetails
 );
+
+
+async function removeFooterImageFrame(dataUrl){
+
+  const image =
+    new Image();
+
+
+  await new Promise(
+    (resolve, reject) => {
+
+      image.addEventListener(
+        "load",
+        resolve,
+        {once:true}
+      );
+
+      image.addEventListener(
+        "error",
+        reject,
+        {once:true}
+      );
+
+      image.src =
+        dataUrl;
+
+    }
+  );
+
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+  canvas.width =
+    image.naturalWidth;
+
+  canvas.height =
+    image.naturalHeight;
+
+
+  const context =
+    canvas.getContext("2d");
+
+  context.drawImage(
+    image,
+    0,
+    0
+  );
+
+
+  const pixels =
+    context.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+  for(let index = 0; index < pixels.data.length; index += 4){
+
+    const red = pixels.data[index];
+    const green = pixels.data[index + 1];
+    const blue = pixels.data[index + 2];
+
+
+    /* Make the near-white/neutral background and its pale frame transparent
+       while retaining the dark footer artwork. */
+    if(
+      red > 215 &&
+      green > 215 &&
+      blue > 215 &&
+      Math.max(red, green, blue) - Math.min(red, green, blue) < 18
+    ){
+
+      pixels.data[index + 3] =
+        0;
+
+    }
+
+  }
+
+
+  context.putImageData(
+    pixels,
+    0,
+    0
+  );
+
+  return canvas.toDataURL(
+    "image/png"
+  );
+
+}
 
 
 footerImageInput.addEventListener(
@@ -1513,10 +1651,26 @@ footerImageInput.addEventListener(
 
     reader.addEventListener(
       "load",
-      () => {
+      async () => {
 
-        pendingFooterImageData =
-          String(reader.result);
+        try{
+
+          pendingFooterImageData =
+            await removeFooterImageFrame(
+              String(reader.result)
+            );
+
+        }catch(error){
+
+          console.warn(
+            "Could not clean footer image:",
+            error
+          );
+
+          pendingFooterImageData =
+            String(reader.result);
+
+        }
 
         clearError();
 
@@ -1789,6 +1943,12 @@ async function handleFile(file){
     applyBtn.classList.remove(
       "hidden"
     );
+
+    hasUnsavedChanges =
+      false;
+
+    applyBtn.textContent =
+      "Download PDF";
 
 
     resultCard.classList.remove(
@@ -2241,10 +2401,13 @@ function updateFooterPreview(){
     settings.footerImage;
 
 
-  footerImagePreview.style.width =
+  /* Give the draggable wrapper an explicit width. Previously the image's
+     percentage max-width was resolved against its own shrink-to-fit parent,
+     so repositioning could change its rendered size. */
+  footerOverlay.style.width =
     Math.max(
-      36,
-      shortest * 0.18 * footer.scale
+      80,
+      shortest * 0.30 * footer.scale
     ) + "px";
 
 
@@ -2416,6 +2579,9 @@ centerToggle.addEventListener(
 
 function markChanged(){
 
+  hasUnsavedChanges =
+    true;
+
   downloadBtn.classList.add(
     "hidden"
   );
@@ -2424,6 +2590,9 @@ function markChanged(){
   applyBtn.classList.remove(
     "hidden"
   );
+
+  applyBtn.textContent =
+    "Apply Changes";
 
 }
 
@@ -3278,6 +3447,27 @@ async function createEditorOverlayPng(){
   }
 
 
+  const watermarkWasSelected =
+    watermarkOverlay.classList.contains(
+      "selected"
+    );
+
+  const footerWasSelected =
+    footerOverlay.classList.contains(
+      "selected"
+    );
+
+
+  /* Selection outlines are editing UI only and must never be baked into
+     the transparent image layer saved into the PDF. */
+  watermarkOverlay.classList.remove(
+    "selected"
+  );
+
+  footerOverlay.classList.remove(
+    "selected"
+  );
+
   previewCanvasWrap.classList.add(
     "export-capture"
   );
@@ -3285,12 +3475,56 @@ async function createEditorOverlayPng(){
 
   try{
 
+    await waitFrames();
+
     const overlayCanvas =
       await html2canvas(
         previewCanvasWrap,
         {
           backgroundColor:null,
           scale:2,
+          onclone:clonedDocument => {
+
+            const clonedWatermark =
+              clonedDocument.getElementById(
+                "watermarkOverlay"
+              );
+
+            const clonedFooter =
+              clonedDocument.getElementById(
+                "footerOverlay"
+              );
+
+            const clonedFooterImage =
+              clonedDocument.getElementById(
+                "footerImagePreview"
+              );
+
+
+            [
+              clonedWatermark,
+              clonedFooter,
+              clonedFooterImage
+            ].filter(Boolean).forEach(
+              element => {
+
+                element.classList.remove(
+                  "selected"
+                );
+
+                element.style.outline =
+                  "none";
+
+                element.style.border =
+                  "0";
+
+                element.style.boxShadow =
+                  "none";
+
+              }
+            );
+
+          },
           ignoreElements:element =>
             element.id ===
             "pdfPreviewCanvas"
@@ -3306,6 +3540,16 @@ async function createEditorOverlayPng(){
 
     previewCanvasWrap.classList.remove(
       "export-capture"
+    );
+
+    watermarkOverlay.classList.toggle(
+      "selected",
+      watermarkWasSelected
+    );
+
+    footerOverlay.classList.toggle(
+      "selected",
+      footerWasSelected
     );
 
   }
@@ -3840,6 +4084,10 @@ applyBtn.addEventListener(
     }
 
 
+    const downloadImmediately =
+      !hasUnsavedChanges;
+
+
     processing =
       true;
 
@@ -3931,6 +4179,17 @@ applyBtn.addEventListener(
       );
 
 
+      hasUnsavedChanges =
+        false;
+
+
+      if(downloadImmediately){
+
+        downloadBtn.click();
+
+      }
+
+
       /*
         Apply disappears once the current
         editor state has been exported.
@@ -3962,7 +4221,9 @@ applyBtn.addEventListener(
         false;
 
       applyBtn.textContent =
-        "Apply Changes";
+        hasUnsavedChanges
+          ? "Apply Changes"
+          : "Download PDF";
 
     }
 
@@ -4130,13 +4391,15 @@ anotherBtn.addEventListener(
       "hidden"
     );
 
+    hasUnsavedChanges =
+      false;
+
+    applyBtn.textContent =
+      "Download PDF";
+
 
     applyBtn.disabled =
       false;
-
-
-    applyBtn.textContent =
-      "Apply Changes";
 
 
     /*
