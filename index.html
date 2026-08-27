@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Watermark Tool</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" integrity="sha512-1p6ZGtN7YWmyC0F/BLgY6wm/lmMt6Vd8SkVau1WVQaz6ROpcuv9O2NwFHi8OYuTLW3E1XJOgnFCX7YKQfp9nHg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
-:root{--ink:#1B2A4A;--ink-soft:#4A5578;--paper:#F6F4EF;--paper-line:#E3DFD3;--gold:#B08D57;--good:#2F6B4F;--bad:#A63A3A;--radius:14px}
+:root{--ink:#1B2A4A;--ink-soft:#4A5578;--paper:#F6F4EF;--paper-line:#E3DFD3;--gold:#B08D57;--good:#2F6B4F;--bad:#A63A3A;--info:#3A6EA5;--radius:14px}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);background-image:repeating-linear-gradient(var(--paper-line) 0 1px,transparent 1px 32px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);min-height:100vh;padding:0 0 60px}
 .app{width:100%;max-width:520px;margin:auto;padding:28px 20px 0}
@@ -17,15 +17,17 @@ header p{margin:4px 0;color:var(--ink-soft);font-size:14px}
 .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin:0 0 14px;font-weight:700}
 label.field{display:block;font-size:13px;color:var(--ink-soft);margin:14px 0 6px}
 label.field:first-of-type{margin-top:0}
+.hint{font-size:12px;color:var(--ink-soft);margin-top:5px}
 input[type=text],input[type=tel],select{width:100%;padding:13px 14px;border:1.5px solid var(--paper-line);border-radius:10px;font-size:16px;color:var(--ink);background:var(--paper)}
 input:focus,select:focus{outline:none;border-color:var(--gold)}
+input.invalid{border-color:var(--bad)}
 .settings-summary{display:flex;justify-content:space-between;align-items:center}
 .settings-summary div{font-size:14px;line-height:1.5}
 .settings-summary b{display:block}
 .link-btn{background:none;border:0;color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;padding:6px}
 .upload-zone{display:block;position:relative;overflow:hidden;width:100%;border:2px dashed var(--paper-line);border-radius:var(--radius);padding:36px 20px;text-align:center;background:#fff;cursor:pointer;transition:border-color .15s,opacity .15s;margin-bottom:16px}
 .upload-zone.disabled{opacity:.5;cursor:not-allowed}
-.upload-zone:active{border-color:var(--gold)}
+.upload-zone:not(.disabled):active{border-color:var(--gold)}
 .upload-zone .icon{font-size:30px;margin-bottom:8px}
 .upload-zone .big{font-size:17px;font-weight:700;color:var(--ink)}
 .upload-zone .small{font-size:13px;color:var(--ink-soft);margin-top:4px}
@@ -39,6 +41,7 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 .btn:disabled{opacity:.55;cursor:not-allowed}
 .status{text-align:center;padding:10px 0;font-size:14px;color:var(--ink-soft)}
 .status.error{color:var(--bad)}
+.status.info{color:var(--info)}
 .spinner{width:22px;height:22px;border:3px solid var(--paper-line);border-top-color:var(--gold);border-radius:50%;margin:0 auto 10px;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .result{text-align:center}
@@ -62,7 +65,7 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 <div class="card" id="setupCard">
 <h2>Your details</h2>
 <label class="field" for="wmText">Watermark text</label>
-<input type="text" id="wmText" placeholder="">
+<input type="text" id="wmText" placeholder="e.g. COPY or CONFIDENTIAL" maxlength="60">
 <label class="field" for="watermarkFont">Watermark font</label>
 <select id="watermarkFont">
 <option value="TimesRomanItalic">Times New Roman — Italic</option>
@@ -73,9 +76,10 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 <option value="Courier">Courier — Regular</option>
 </select>
 <label class="field" for="footerName">Full name</label>
-<input type="text" id="footerName" placeholder="">
+<input type="text" id="footerName" placeholder="e.g. Jordan Reyes" maxlength="80">
 <label class="field" for="footerPhone">Phone number</label>
-<input type="tel" id="footerPhone" placeholder="">
+<input type="tel" id="footerPhone" placeholder="e.g. +1 555 123 4567" maxlength="30">
+<div class="hint" id="phoneHint"></div>
 <button class="btn btn-primary" style="margin-top:18px" id="saveSettingsBtn">Save my details</button>
 </div>
 
@@ -86,11 +90,11 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 </div>
 </div>
 
-<div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Choose a PDF">
+<div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Choose a PDF" aria-disabled="true">
 <div class="icon">📄</div>
-<div class="big">Tap to choose a PDF</div>
-<div class="small">Choose a PDF before or after entering your details.</div>
-<input type="file" id="fileInput" accept="application/pdf,.pdf">
+<div class="big" id="uploadZoneTitle">Save your details first</div>
+<div class="small" id="uploadZoneSubtitle">Fill in the form above, then you can choose a PDF.</div>
+<input type="file" id="fileInput" accept="application/pdf,.pdf" disabled tabindex="-1">
 </div>
 
 <div class="card hidden" id="workingCard">
@@ -116,253 +120,305 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 </div>
 </div>
 
-<div class="status error hidden" id="errorStatus"></div>
+<div class="status hidden" id="errorStatus"></div>
 <noscript><div class="status error">JavaScript must be enabled for the watermark tool to work.</div></noscript>
 </div>
 
 <script>
-const PDFLibReady=typeof PDFLib!=="undefined";
-const {PDFDocument,rgb,degrees,StandardFonts}=PDFLibReady?PDFLib:{};
-const setupCard=document.getElementById("setupCard");
-const summaryCard=document.getElementById("summaryCard");
-const uploadZone=document.getElementById("uploadZone");
-const fileInput=document.getElementById("fileInput");
-const workingCard=document.getElementById("workingCard");
-const workingStatus=document.getElementById("workingStatus");
-const resultCard=document.getElementById("resultCard");
-const errorStatus=document.getElementById("errorStatus");
-const downloadBtn=document.getElementById("downloadBtn");
-const shareBtn=document.getElementById("shareBtn");
-const previewBtn=document.getElementById("previewBtn");
-const pdfPreview=document.getElementById("pdfPreview");
+const MAX_PDF_BYTES = 60 * 1024 * 1024; // 60MB safety guard for mobile browsers
+const PDFLibReady = typeof PDFLib !== "undefined";
+const {PDFDocument, rgb, degrees, StandardFonts} = PDFLibReady ? PDFLib : {};
 
-let settings=null;
-let pendingFile=null;
-let currentObjectUrl=null;
-let currentFileName="stamped.pdf";
+const setupCard = document.getElementById("setupCard");
+const summaryCard = document.getElementById("summaryCard");
+const uploadZone = document.getElementById("uploadZone");
+const uploadZoneTitle = document.getElementById("uploadZoneTitle");
+const uploadZoneSubtitle = document.getElementById("uploadZoneSubtitle");
+const fileInput = document.getElementById("fileInput");
+const workingCard = document.getElementById("workingCard");
+const workingStatus = document.getElementById("workingStatus");
+const resultCard = document.getElementById("resultCard");
+const errorStatus = document.getElementById("errorStatus");
+const downloadBtn = document.getElementById("downloadBtn");
+const shareBtn = document.getElementById("shareBtn");
+const previewBtn = document.getElementById("previewBtn");
+const pdfPreview = document.getElementById("pdfPreview");
+const phoneHint = document.getElementById("phoneHint");
+const phoneInput = document.getElementById("footerPhone");
+
+let settings = null;
+let currentObjectUrl = null;
+let currentFileName = "stamped.pdf";
+
+function showMessage(text, kind){ // kind: "error" | "info"
+  errorStatus.textContent = text;
+  errorStatus.className = "status " + (kind === "info" ? "info" : "error");
+  errorStatus.classList.remove("hidden");
+}
+function clearMessage(){
+  errorStatus.classList.add("hidden");
+}
 
 function showOnly(el){
-  [setupCard,summaryCard].forEach(c=>c.classList.add("hidden"));
+  [setupCard, summaryCard].forEach(c => c.classList.add("hidden"));
   el.classList.remove("hidden");
 }
 
 function setUploadEnabled(enabled){
-  fileInput.disabled=false;
-  uploadZone.classList.remove("disabled");
+  fileInput.disabled = !enabled;
+  fileInput.tabIndex = enabled ? 0 : -1;
+  uploadZone.classList.toggle("disabled", !enabled);
+  uploadZone.setAttribute("aria-disabled", String(!enabled));
+  uploadZone.tabIndex = enabled ? 0 : -1;
+  uploadZoneTitle.textContent = enabled ? "Tap to choose a PDF" : "Save your details first";
+  uploadZoneSubtitle.textContent = enabled
+    ? "Or drag and drop a file here."
+    : "Fill in the form above, then you can choose a PDF.";
 }
 
 function renderSummary(){
-  document.getElementById("summaryName").textContent=settings.footerName;
-  document.getElementById("summaryPhone").textContent=settings.footerPhone;
+  document.getElementById("summaryName").textContent = settings.footerName;
+  document.getElementById("summaryPhone").textContent = " · " + settings.footerPhone;
   showOnly(summaryCard);
   setUploadEnabled(true);
 }
 
-function saveSettings(){
-  const wmText=document.getElementById("wmText").value.trim();
-  const footerName=document.getElementById("footerName").value.trim();
-  const footerPhone=document.getElementById("footerPhone").value.trim();
-  const watermarkFont=document.getElementById("watermarkFont").value;
+function isPlausiblePhone(value){
+  // Loose validation: digits, spaces, +, -, (), at least 7 digits total
+  const digits = value.replace(/\D/g, "");
+  return /^[0-9+\-()\s]+$/.test(value) && digits.length >= 7 && digits.length <= 15;
+}
 
-  if(!wmText||!footerName||!footerPhone){
-    errorStatus.textContent="Please fill in all three fields.";
-    errorStatus.classList.remove("hidden");
+phoneInput.addEventListener("input", () => {
+  const v = phoneInput.value.trim();
+  if(!v){ phoneHint.textContent=""; phoneInput.classList.remove("invalid"); return; }
+  if(isPlausiblePhone(v)){
+    phoneHint.textContent = "";
+    phoneInput.classList.remove("invalid");
+  }else{
+    phoneHint.textContent = "Looks unusual — digits, spaces, +, - and () are expected.";
+    phoneInput.classList.add("invalid");
+  }
+});
+
+function saveSettings(){
+  const wmText = document.getElementById("wmText").value.trim();
+  const footerName = document.getElementById("footerName").value.trim();
+  const footerPhone = document.getElementById("footerPhone").value.trim();
+  const watermarkFont = document.getElementById("watermarkFont").value;
+
+  if(!wmText || !footerName || !footerPhone){
+    showMessage("Please fill in all three fields.", "error");
+    return;
+  }
+  if(!isPlausiblePhone(footerPhone)){
+    showMessage("That phone number doesn't look right. Please check it and try again.", "error");
+    phoneInput.classList.add("invalid");
     return;
   }
 
-  settings={wmText,footerName,footerPhone,watermarkFont};
-  try{localStorage.setItem("watermark-settings",JSON.stringify(settings));}catch(e){}
-  errorStatus.classList.add("hidden");
+  settings = {wmText, footerName, footerPhone, watermarkFont};
+  try{ localStorage.setItem("watermark-settings", JSON.stringify(settings)); }catch(e){}
+  clearMessage();
   renderSummary();
-
-  if(pendingFile){
-    const fileToProcess=pendingFile;
-    pendingFile=null;
-    handleFile(fileToProcess);
-  }
 }
 
 function loadSettings(){
   try{
-    const saved=localStorage.getItem("watermark-settings");
+    const saved = localStorage.getItem("watermark-settings");
     if(saved){
-      settings=JSON.parse(saved);
-      document.getElementById("wmText").value=settings.wmText||"";
-      document.getElementById("footerName").value=settings.footerName||"";
-      document.getElementById("footerPhone").value=settings.footerPhone||"";
-      document.getElementById("watermarkFont").value=settings.watermarkFont||"TimesRomanItalic";
+      settings = JSON.parse(saved);
+      document.getElementById("wmText").value = settings.wmText || "";
+      document.getElementById("footerName").value = settings.footerName || "";
+      document.getElementById("footerPhone").value = settings.footerPhone || "";
+      document.getElementById("watermarkFont").value = settings.watermarkFont || "TimesRomanItalic";
       renderSummary();
       return;
     }
   }catch(e){}
   showOnly(setupCard);
-  setUploadEnabled(true);
+  setUploadEnabled(false);
 }
 
-document.getElementById("saveSettingsBtn").addEventListener("click",saveSettings);
+document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
 
-document.getElementById("editSettingsBtn").addEventListener("click",()=>{
+document.getElementById("editSettingsBtn").addEventListener("click", () => {
   showOnly(setupCard);
-  setUploadEnabled(true);
+  // Keep upload enabled while editing if settings already exist — only
+  // block it if there are no valid saved settings at all.
+  setUploadEnabled(!!settings);
 });
 
-function handleFile(file){
-  if(!file)return;
+async function handleFile(file){
+  if(!file) return;
+  if(fileInput.disabled){
+    showMessage("Please save your details before choosing a PDF.", "info");
+    return;
+  }
   if(!PDFLibReady){
-    errorStatus.textContent="The PDF engine did not load. Please refresh the page and try again.";
-    errorStatus.classList.remove("hidden");
+    showMessage("The PDF engine did not load. Please refresh the page and try again.", "error");
     return;
   }
-  if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){
-    errorStatus.textContent="That doesn't look like a PDF — please choose a PDF file.";
-    errorStatus.classList.remove("hidden");
+  if(file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")){
+    showMessage("That doesn't look like a PDF — please choose a PDF file.", "error");
     return;
   }
-  if(!settings){
-    pendingFile=file;
-    errorStatus.textContent="PDF selected. Enter your details and tap Save my details to stamp it.";
-    errorStatus.classList.remove("hidden");
+  if(file.size > MAX_PDF_BYTES){
+    showMessage("That PDF is quite large (over 60MB) and may not process well on this device.", "error");
     return;
   }
 
-  errorStatus.classList.add("hidden");
+  clearMessage();
   resultCard.classList.add("hidden");
   workingCard.classList.remove("hidden");
-  workingStatus.textContent="Stamping your PDF…";
+  workingStatus.textContent = "Stamping your PDF…";
 
-  setTimeout(async()=>{
-    try{
-      const bytes=await file.arrayBuffer();
-      const stampedBytes=await stampPdf(bytes,settings);
-      const blob=new Blob([stampedBytes],{type:"application/pdf"});
-      if(currentObjectUrl)URL.revokeObjectURL(currentObjectUrl);
-      currentObjectUrl=URL.createObjectURL(blob);
-      currentFileName=file.name.replace(/\.pdf$/i,"")+" - stamped.pdf";
+  try{
+    const bytes = await file.arrayBuffer();
+    const stampedBytes = await stampPdf(bytes, settings);
+    const blob = new Blob([stampedBytes], {type: "application/pdf"});
+    if(currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = URL.createObjectURL(blob);
+    currentFileName = file.name.replace(/\.pdf$/i, "") + " - stamped.pdf";
 
-      downloadBtn.href=currentObjectUrl;
-      downloadBtn.download=currentFileName;
-      document.getElementById("resultFilename").textContent=currentFileName;
-      pdfPreview.src=currentObjectUrl;
+    downloadBtn.href = currentObjectUrl;
+    downloadBtn.download = currentFileName;
+    document.getElementById("resultFilename").textContent = currentFileName;
+    pdfPreview.src = currentObjectUrl;
 
-      workingCard.classList.add("hidden");
-      resultCard.classList.remove("hidden");
-    }catch(err){
-      console.error(err);
-      workingCard.classList.add("hidden");
-      errorStatus.textContent="Couldn't stamp that PDF. Please try another PDF.";
-      errorStatus.classList.remove("hidden");
-    }
-  },50);
+    workingCard.classList.add("hidden");
+    resultCard.classList.remove("hidden");
+  }catch(err){
+    console.error(err);
+    workingCard.classList.add("hidden");
+    showMessage("Couldn't stamp that PDF. It may be encrypted, corrupted, or an unsupported format. Please try another PDF.", "error");
+  }
 }
 
-fileInput.addEventListener("change",e=>{
-  const file=e.target.files&&e.target.files[0];
+fileInput.addEventListener("change", e => {
+  const file = e.target.files && e.target.files[0];
   handleFile(file);
-  e.target.value="";
+  e.target.value = "";
 });
 
-["dragenter","dragover"].forEach(evt=>{
-  uploadZone.addEventListener(evt,e=>{
-    if(fileInput.disabled)return;
+["dragenter", "dragover"].forEach(evt => {
+  uploadZone.addEventListener(evt, e => {
+    if(fileInput.disabled) return;
     e.preventDefault();
-    uploadZone.style.borderColor="var(--gold)";
+    uploadZone.style.borderColor = "var(--gold)";
   });
 });
 
-["dragleave","dragend"].forEach(evt=>{
-  uploadZone.addEventListener(evt,e=>{
+["dragleave", "dragend"].forEach(evt => {
+  uploadZone.addEventListener(evt, e => {
     e.preventDefault();
-    uploadZone.style.borderColor="";
+    uploadZone.style.borderColor = "";
   });
 });
 
-uploadZone.addEventListener("drop",e=>{
+uploadZone.addEventListener("drop", e => {
   e.preventDefault();
-  uploadZone.style.borderColor="";
-  if(fileInput.disabled)return;
-  const file=e.dataTransfer.files&&e.dataTransfer.files[0];
+  uploadZone.style.borderColor = "";
+  if(fileInput.disabled){
+    showMessage("Please save your details before choosing a PDF.", "info");
+    return;
+  }
+  const file = e.dataTransfer.files && e.dataTransfer.files[0];
   handleFile(file);
 });
 
-uploadZone.addEventListener("keydown",e=>{
-  if(fileInput.disabled)return;
-  if(e.key==="Enter"||e.key===" "){
+uploadZone.addEventListener("keydown", e => {
+  if(fileInput.disabled) return;
+  if(e.key === "Enter" || e.key === " "){
     e.preventDefault();
     fileInput.click();
   }
 });
 
-document.getElementById("anotherBtn").addEventListener("click",()=>{
+document.getElementById("anotherBtn").addEventListener("click", () => {
   resultCard.classList.add("hidden");
-  fileInput.value="";
+  fileInput.value = "";
   if(currentObjectUrl){
     URL.revokeObjectURL(currentObjectUrl);
-    currentObjectUrl=null;
+    currentObjectUrl = null;
   }
   pdfPreview.removeAttribute("src");
 });
 
-previewBtn.addEventListener("click",()=>{
-  if(!currentObjectUrl)return;
-  window.open(currentObjectUrl,"_blank","noopener");
+previewBtn.addEventListener("click", () => {
+  if(!currentObjectUrl) return;
+  window.open(currentObjectUrl, "_blank", "noopener");
 });
 
-downloadBtn.addEventListener("click",()=>{});
-
-shareBtn.addEventListener("click",async()=>{
-  if(!currentObjectUrl)return;
+shareBtn.addEventListener("click", async () => {
+  if(!currentObjectUrl) return;
   try{
-    const response=await fetch(currentObjectUrl);
-    const blob=await response.blob();
-    const file=new File([blob],currentFileName,{type:"application/pdf"});
-    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:currentFileName});
+    const response = await fetch(currentObjectUrl);
+    const blob = await response.blob();
+    const file = new File([blob], currentFileName, {type: "application/pdf"});
+    if(navigator.share && navigator.canShare && navigator.canShare({files: [file]})){
+      await navigator.share({files: [file], title: currentFileName});
     }else if(navigator.share){
-      await navigator.share({title:currentFileName,text:"Stamped PDF"});
+      await navigator.share({title: currentFileName, text: "Stamped PDF"});
     }else{
-      errorStatus.textContent="Sharing isn't supported in this browser. Use Download PDF instead.";
-      errorStatus.classList.remove("hidden");
+      showMessage("Sharing isn't supported in this browser. Use Download PDF instead.", "error");
     }
   }catch(err){
-    if(err&&err.name==="AbortError")return;
-    errorStatus.textContent="Couldn't open the share menu. You can use Download PDF instead.";
-    errorStatus.classList.remove("hidden");
+    if(err && err.name === "AbortError") return;
+    showMessage("Couldn't open the share menu. You can use Download PDF instead.", "error");
   }
 });
 
 function getWatermarkFont(fontKey){
-  return StandardFonts[fontKey]||StandardFonts.TimesRomanItalic;
+  return StandardFonts[fontKey] || StandardFonts.TimesRomanItalic;
 }
 
-async function stampPdf(arrayBuffer,s){
-  const pdfDoc=await PDFDocument.load(arrayBuffer);
-  const watermarkFont=await pdfDoc.embedFont(getWatermarkFont(s.watermarkFont));
-  const boldFont=await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const regFont=await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const pages=pdfDoc.getPages();
-  const angle=35;
-  const angleRad=angle*Math.PI/180;
+async function stampPdf(arrayBuffer, s){
+  const pdfDoc = await PDFDocument.load(arrayBuffer);
+  const watermarkFont = await pdfDoc.embedFont(getWatermarkFont(s.watermarkFont));
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const regFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const pages = pdfDoc.getPages();
+  const angle = 35;
+  const angleRad = angle * Math.PI / 180;
 
   for(const page of pages){
-    const {width,height}=page.getSize();
-    const wmFontSize=Math.min(width,height)*0.16;
-    const wmWidth=watermarkFont.widthOfTextAtSize(s.wmText,wmFontSize);
-    const cx=width/2,cy=height/2;
-    const wmX=cx-(wmWidth/2)*Math.cos(angleRad);
-    const wmY=cy-(wmWidth/2)*Math.sin(angleRad);
+    const {width, height} = page.getSize();
+    const shortSide = Math.min(width, height);
 
-    page.drawText(s.wmText,{x:wmX,y:wmY,size:wmFontSize,font:watermarkFont,color:rgb(.55,.55,.55),opacity:.32,rotate:degrees(angle)});
+    // Scale watermark font down for long strings so it doesn't run off the page
+    let wmFontSize = shortSide * 0.16;
+    let wmWidth = watermarkFont.widthOfTextAtSize(s.wmText, wmFontSize);
+    const maxWmWidth = Math.hypot(width, height) * 0.62; // keep diagonal text on-page
+    if(wmWidth > maxWmWidth){
+      wmFontSize *= maxWmWidth / wmWidth;
+      wmWidth = watermarkFont.widthOfTextAtSize(s.wmText, wmFontSize);
+    }
 
-    const margin=Math.min(width,height)*.045;
-    const nameFontSize=Math.min(width,height)*.028;
-    const phoneFontSize=nameFontSize*.82;
-    const nameWidth=boldFont.widthOfTextAtSize(s.footerName,nameFontSize);
-    const phoneWidth=regFont.widthOfTextAtSize(s.footerPhone,phoneFontSize);
-    const phoneY=margin;
-    const nameY=margin+phoneFontSize+nameFontSize*.35;
+    // Account for both width and the font's vertical extent so the rotated
+    // text is centered on the page, not just centered horizontally.
+    const ascent = watermarkFont.heightAtSize(wmFontSize);
+    const halfW = wmWidth / 2;
+    const halfH = ascent / 2;
+    const cx = width / 2, cy = height / 2;
+    const wmX = cx - halfW * Math.cos(angleRad) + halfH * Math.sin(angleRad);
+    const wmY = cy - halfW * Math.sin(angleRad) - halfH * Math.cos(angleRad);
 
-    page.drawText(s.footerName,{x:width-margin-nameWidth,y:nameY,size:nameFontSize,font:boldFont,color:rgb(.1,.1,.1)});
-    page.drawText(s.footerPhone,{x:width-margin-phoneWidth,y:phoneY,size:phoneFontSize,font:regFont,color:rgb(.1,.1,.1)});
+    page.drawText(s.wmText, {
+      x: wmX, y: wmY, size: wmFontSize, font: watermarkFont,
+      color: rgb(.55, .55, .55), opacity: .32, rotate: degrees(angle)
+    });
+
+    const margin = shortSide * .045;
+    const nameFontSize = shortSide * .028;
+    const phoneFontSize = nameFontSize * .82;
+    const nameWidth = boldFont.widthOfTextAtSize(s.footerName, nameFontSize);
+    const phoneWidth = regFont.widthOfTextAtSize(s.footerPhone, phoneFontSize);
+    const phoneY = margin;
+    const nameY = margin + phoneFontSize + nameFontSize * .35;
+
+    page.drawText(s.footerName, {x: width - margin - nameWidth, y: nameY, size: nameFontSize, font: boldFont, color: rgb(.1, .1, .1)});
+    page.drawText(s.footerPhone, {x: width - margin - phoneWidth, y: phoneY, size: phoneFontSize, font: regFont, color: rgb(.1, .1, .1)});
   }
   return pdfDoc.save();
 }
