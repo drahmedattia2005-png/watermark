@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0, maximum-scale=1"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Watermark Tool</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -23,12 +20,9 @@
   --radius:14px;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
-html,
-body{
+html,body{
   margin:0;
   padding:0;
   min-height:100%;
@@ -42,13 +36,10 @@ body{
   );
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   color:var(--ink);
-  min-height:100vh;
   padding-bottom:60px;
 }
 
-button,
-input,
-select{
+button,input,select{
   font:inherit;
 }
 
@@ -71,7 +62,6 @@ header .mark{
   color:var(--ink);
   transform:rotate(-6deg);
   display:inline-block;
-  margin-bottom:2px;
 }
 
 header p{
@@ -95,7 +85,6 @@ header p{
   letter-spacing:.08em;
   color:var(--gold);
   margin:0 0 14px;
-  font-weight:700;
 }
 
 label.field{
@@ -135,9 +124,9 @@ select:focus{
 }
 
 .settings-summary div{
+  min-width:0;
   font-size:14px;
   line-height:1.5;
-  min-width:0;
 }
 
 .settings-summary b{
@@ -168,18 +157,12 @@ select:focus{
   text-align:center;
   background:#fff;
   cursor:pointer;
-  transition:
-    border-color .15s,
-    background-color .15s,
-    opacity .15s;
   margin-bottom:16px;
+  transition:.15s;
   -webkit-tap-highlight-color:transparent;
 }
 
-.upload-zone:hover{
-  border-color:var(--gold);
-}
-
+.upload-zone:hover,
 .upload-zone.dragover{
   border-color:var(--gold);
   background:#fcfaf5;
@@ -187,13 +170,6 @@ select:focus{
 
 .upload-zone.disabled{
   opacity:.5;
-  cursor:not-allowed;
-  pointer-events:none;
-}
-
-.upload-zone .icon,
-.upload-zone .big,
-.upload-zone .small{
   pointer-events:none;
 }
 
@@ -247,10 +223,9 @@ select:focus{
 .btn-secondary{
   background:transparent;
   color:var(--ink-soft);
-  margin-top:10px;
-  font-weight:600;
   font-size:14px;
   padding:8px;
+  margin-top:10px;
 }
 
 .btn:disabled{
@@ -280,15 +255,8 @@ select:focus{
 }
 
 @keyframes spin{
-  to{
-    transform:rotate(360deg);
-  }
+  to{transform:rotate(360deg)}
 }
-
-
-/* =====================================================
-   TABS
-===================================================== */
 
 .editor-tabs{
   display:grid;
@@ -298,7 +266,6 @@ select:focus{
 }
 
 .editor-tab{
-  width:100%;
   padding:11px 12px;
   border:1.5px solid var(--paper-line);
   border-radius:10px;
@@ -314,11 +281,6 @@ select:focus{
   border-color:var(--ink);
   color:#fff;
 }
-
-
-/* =====================================================
-   PREVIEW
-===================================================== */
 
 .preview-wrap{
   border:1px solid var(--paper-line);
@@ -341,9 +303,7 @@ select:focus{
 
 #previewCanvasWrap{
   position:relative;
-  display:block;
   width:100%;
-  max-width:100%;
   overflow:hidden;
   touch-action:none;
 }
@@ -356,30 +316,26 @@ select:focus{
   box-shadow:0 1px 5px rgba(0,0,0,.15);
 }
 
-
-/* =====================================================
-   EDITABLE ELEMENTS
-===================================================== */
-
 .preview-element{
   position:absolute;
   z-index:3;
   transform-origin:center center;
+  white-space:nowrap;
   user-select:none;
   -webkit-user-select:none;
-  white-space:nowrap;
 }
 
 #watermarkOverlay{
   color:rgba(140,140,140,.58);
   line-height:1;
   cursor:grab;
-  touch-action:none;
   padding:0;
   margin:0;
+  touch-action:none;
 }
 
-#watermarkOverlay.dragging{
+#watermarkOverlay.dragging,
+#footerOverlay.dragging{
   cursor:grabbing;
 }
 
@@ -388,13 +344,9 @@ select:focus{
   line-height:1.15;
   text-align:right;
   cursor:grab;
-  touch-action:none;
   padding:8px 10px;
   margin:-8px -10px;
-}
-
-#footerOverlay.dragging{
-  cursor:grabbing;
+  touch-action:none;
 }
 
 .footer-name-preview{
@@ -414,17 +366,11 @@ select:focus{
   cursor:default!important;
 }
 
-
-/* =====================================================
-   CONTROLS
-===================================================== */
-
 .preview-controls{
   background:#fff;
   border:1px solid var(--paper-line);
   border-radius:12px;
   padding:14px;
-  margin-top:12px;
   margin-bottom:16px;
 }
 
@@ -444,8 +390,8 @@ select:focus{
 .preview-controls-help{
   font-size:12px;
   color:var(--ink-soft);
-  line-height:1.5;
   margin-bottom:14px;
+  line-height:1.5;
 }
 
 .control-row{
@@ -455,35 +401,29 @@ select:focus{
   margin-top:12px;
 }
 
-.control-row:first-of-type{
-  margin-top:0;
-}
-
 .control-label{
-  font-size:13px;
-  color:var(--ink-soft);
   width:64px;
   flex-shrink:0;
+  font-size:13px;
+  color:var(--ink-soft);
 }
 
 .control-slider{
   width:100%;
   accent-color:var(--gold);
-  cursor:pointer;
 }
 
 .control-value{
-  font-size:13px;
-  font-weight:700;
   min-width:48px;
   text-align:right;
+  font-size:13px;
+  font-weight:700;
 }
 
 .center-row{
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  gap:12px;
+  align-items:center;
   margin-top:16px;
   padding-top:14px;
   border-top:1px solid var(--paper-line);
@@ -498,7 +438,6 @@ select:focus{
   width:48px;
   height:28px;
   position:relative;
-  flex-shrink:0;
 }
 
 .toggle input{
@@ -513,7 +452,6 @@ select:focus{
   background:#d8d5cd;
   border-radius:999px;
   cursor:pointer;
-  transition:.2s;
 }
 
 .toggle-slider:before{
@@ -537,11 +475,6 @@ select:focus{
   transform:translateX(20px);
 }
 
-
-/* =====================================================
-   HIDDEN
-===================================================== */
-
 .hidden{
   display:none!important;
 }
@@ -558,9 +491,7 @@ select:focus{
 </header>
 
 
-<!-- =====================================================
-     DETAILS
-===================================================== -->
+<!-- DETAILS -->
 
 <div class="card" id="setupCard">
 
@@ -640,9 +571,7 @@ select:focus{
 </div>
 
 
-<!-- =====================================================
-     SAVED DETAILS
-===================================================== -->
+<!-- SAVED DETAILS -->
 
 <div
   class="card hidden"
@@ -669,16 +598,13 @@ select:focus{
 </div>
 
 
-<!-- =====================================================
-     UPLOAD
-===================================================== -->
+<!-- UPLOAD -->
 
 <div
   class="upload-zone hidden"
   id="uploadZone"
   role="button"
   tabindex="0"
-  aria-label="Choose a PDF"
 >
 
   <div class="icon">📄</div>
@@ -700,9 +626,7 @@ select:focus{
 </div>
 
 
-<!-- =====================================================
-     WORKING
-===================================================== -->
+<!-- WORKING -->
 
 <div
   class="card hidden"
@@ -721,9 +645,7 @@ select:focus{
 </div>
 
 
-<!-- =====================================================
-     EDITOR
-===================================================== -->
+<!-- EDITOR -->
 
 <div
   class="card hidden"
@@ -737,6 +659,7 @@ select:focus{
   <div
     class="fname"
     id="resultFilename"
+    style="font-size:13px;color:var(--ink-soft);margin-bottom:16px;word-break:break-all;text-align:center"
   ></div>
 
 
@@ -775,12 +698,10 @@ select:focus{
           id="pdfPreviewCanvas"
         ></canvas>
 
-
         <div
           id="watermarkOverlay"
           class="preview-element selected"
         ></div>
-
 
         <div
           id="footerOverlay"
@@ -826,8 +747,6 @@ select:focus{
     </div>
 
 
-    <!-- SIZE -->
-
     <div class="control-row">
 
       <span class="control-label">
@@ -853,8 +772,6 @@ select:focus{
 
     </div>
 
-
-    <!-- ROTATION -->
 
     <div class="control-row">
 
@@ -882,8 +799,6 @@ select:focus{
     </div>
 
 
-    <!-- WATERMARK ONLY -->
-
     <div
       class="center-row"
       id="watermarkCenterRow"
@@ -909,14 +824,7 @@ select:focus{
   </div>
 
 
-  <!-- =================================================
-       BUTTON ORDER
-
-       1. Apply Changes
-       2. Download
-       3. Share
-       4. Stamp another PDF
-  ================================================== -->
+  <!-- BUTTON ORDER -->
 
   <button
     class="btn btn-primary"
@@ -964,15 +872,6 @@ select:focus{
   id="errorStatus"
 ></div>
 
-
-<noscript>
-
-  <div class="status error">
-    JavaScript must be enabled for the watermark tool to work.
-  </div>
-
-</noscript>
-
 </div>
 
 
@@ -981,7 +880,7 @@ select:focus{
 
 
 /* =====================================================
-   LIBRARIES
+   LIBRARY SETUP
 ===================================================== */
 
 const PDFLibReady =
@@ -999,14 +898,25 @@ if(PDFJSReady){
 }
 
 
-const {
-  PDFDocument,
-  rgb,
-  degrees,
-  StandardFonts
-} = PDFLibReady
-  ? PDFLib
-  : {};
+const PDFDocument =
+  PDFLibReady
+    ? PDFLib.PDFDocument
+    : null;
+
+const rgb =
+  PDFLibReady
+    ? PDFLib.rgb
+    : null;
+
+const degrees =
+  PDFLibReady
+    ? PDFLib.degrees
+    : null;
+
+const StandardFonts =
+  PDFLibReady
+    ? PDFLib.StandardFonts
+    : null;
 
 
 /* =====================================================
@@ -1049,126 +959,74 @@ const applyBtn =
 const anotherBtn =
   document.getElementById("anotherBtn");
 
-
-const pdfPreviewContainer =
-  document.getElementById(
-    "pdfPreviewContainer"
-  );
-
-const previewCanvasWrap =
-  document.getElementById(
-    "previewCanvasWrap"
-  );
-
-const pdfPreviewCanvas =
-  document.getElementById(
-    "pdfPreviewCanvas"
-  );
-
-const pdfPreviewContext =
-  pdfPreviewCanvas.getContext(
-    "2d"
-  );
-
-
-const watermarkOverlay =
-  document.getElementById(
-    "watermarkOverlay"
-  );
-
-const footerOverlay =
-  document.getElementById(
-    "footerOverlay"
-  );
-
-
-const footerNamePreview =
-  document.getElementById(
-    "footerNamePreview"
-  );
-
-const footerPhonePreview =
-  document.getElementById(
-    "footerPhonePreview"
-  );
-
-
 const watermarkTab =
-  document.getElementById(
-    "watermarkTab"
-  );
+  document.getElementById("watermarkTab");
 
 const footerTab =
-  document.getElementById(
-    "footerTab"
-  );
+  document.getElementById("footerTab");
 
+const watermarkOverlay =
+  document.getElementById("watermarkOverlay");
+
+const footerOverlay =
+  document.getElementById("footerOverlay");
+
+const footerNamePreview =
+  document.getElementById("footerNamePreview");
+
+const footerPhonePreview =
+  document.getElementById("footerPhonePreview");
+
+const previewCanvasWrap =
+  document.getElementById("previewCanvasWrap");
+
+const previewCanvas =
+  document.getElementById("pdfPreviewCanvas");
+
+const previewContext =
+  previewCanvas.getContext("2d");
+
+const pdfPreviewContainer =
+  document.getElementById("pdfPreviewContainer");
 
 const selectedElementLabel =
-  document.getElementById(
-    "selectedElementLabel"
-  );
+  document.getElementById("selectedElementLabel");
 
 const sizeSlider =
-  document.getElementById(
-    "sizeSlider"
-  );
+  document.getElementById("sizeSlider");
 
 const sizeValue =
-  document.getElementById(
-    "sizeValue"
-  );
+  document.getElementById("sizeValue");
 
 const rotationSlider =
-  document.getElementById(
-    "rotationSlider"
-  );
+  document.getElementById("rotationSlider");
 
 const rotationValue =
-  document.getElementById(
-    "rotationValue"
-  );
+  document.getElementById("rotationValue");
 
 const centerToggle =
-  document.getElementById(
-    "centerToggle"
-  );
+  document.getElementById("centerToggle");
 
 const watermarkCenterRow =
-  document.getElementById(
-    "watermarkCenterRow"
-  );
-
+  document.getElementById("watermarkCenterRow");
 
 const wmTextInput =
-  document.getElementById(
-    "wmText"
-  );
+  document.getElementById("wmText");
 
 const watermarkFontInput =
-  document.getElementById(
-    "watermarkFont"
-  );
+  document.getElementById("watermarkFont");
 
 const footerNameInput =
-  document.getElementById(
-    "footerName"
-  );
+  document.getElementById("footerName");
 
 const footerPhoneInput =
-  document.getElementById(
-    "footerPhone"
-  );
+  document.getElementById("footerPhone");
 
 const saveSettingsBtn =
-  document.getElementById(
-    "saveSettingsBtn"
-  );
+  document.getElementById("saveSettingsBtn");
 
 const editSettingsBtn =
-  document.getElementById(
-    "editSettingsBtn"
-  );
+  document.getElementById("editSettingsBtn");
 
 
 /* =====================================================
@@ -1184,31 +1042,28 @@ let currentObjectUrl = null;
 let currentFileName =
   "stamped.pdf";
 
-let isProcessing = false;
+let previewPdf = null;
+
+let previewPage = null;
 
 let selectedElement =
   "watermark";
 
-let previewPdfDocument = null;
-
-let previewPage = null;
+let processing = false;
 
 
 /*
-  Position is always the CENTER
-  of the element.
+  These values are normalized to the PDF page:
 
-  x:
-    0 = left
-    .5 = center
-    1 = right
+  x = 0 left
+      0.5 center
+      1 right
 
-  y:
-    0 = bottom
-    .5 = center
-    1 = top
+  y = 0 bottom
+      0.5 center
+      1 top
 */
-let watermarkSettings = {
+let watermark = {
 
   x:0.5,
   y:0.5,
@@ -1222,7 +1077,7 @@ let watermarkSettings = {
 };
 
 
-let footerSettings = {
+let footer = {
 
   x:0.94,
   y:0.075,
@@ -1234,11 +1089,12 @@ let footerSettings = {
 };
 
 
-/* Drag state */
+/*
+  Drag state.
+*/
+let dragging = false;
 
-let draggingElement = null;
-
-let activePointerId = null;
+let dragPointerId = null;
 
 let dragOffsetX = 0;
 
@@ -1249,7 +1105,7 @@ let dragOffsetY = 0;
    UI HELPERS
 ===================================================== */
 
-function showError(message){
+function error(message){
 
   errorStatus.textContent =
     message;
@@ -1273,84 +1129,15 @@ function clearError(){
 }
 
 
-function showSetup(){
-
-  setupCard.classList.remove(
-    "hidden"
-  );
-
-  summaryCard.classList.add(
-    "hidden"
-  );
-
-  uploadZone.classList.add(
-    "hidden"
-  );
-
-  resultCard.classList.add(
-    "hidden"
-  );
-
-}
-
-
-function showUpload(){
-
-  setupCard.classList.add(
-    "hidden"
-  );
-
-  summaryCard.classList.remove(
-    "hidden"
-  );
-
-  uploadZone.classList.remove(
-    "hidden"
-  );
-
-  resultCard.classList.add(
-    "hidden"
-  );
-
-  fileInput.disabled =
-    false;
-
-}
-
-
-function showSavedDetails(){
-
-  document.getElementById(
-    "summaryName"
-  ).textContent =
-    settings.footerName;
-
-
-  document.getElementById(
-    "summaryPhone"
-  ).textContent =
-    settings.footerPhone;
-
-
-  showUpload();
-
-}
-
-
-/* =====================================================
-   MODIFICATION STATE
-===================================================== */
-
-function markEditorModified(){
+function markChanged(){
 
   /*
-    The generated PDF no longer matches
-    the editor.
+    The currently generated PDF is no longer
+    synchronized with the editor.
   */
   downloadBtn.classList.add(
     "hidden"
   );
-
 
   applyBtn.classList.remove(
     "hidden"
@@ -1360,12 +1147,12 @@ function markEditorModified(){
 
 
 /* =====================================================
-   SETTINGS
+   DETAILS
 ===================================================== */
 
-function getFormSettings(){
+function saveDetails(){
 
-  return {
+  const newSettings = {
 
     wmText:
       wmTextInput.value.trim(),
@@ -1381,14 +1168,6 @@ function getFormSettings(){
 
   };
 
-}
-
-
-function saveSettings(){
-
-  const newSettings =
-    getFormSettings();
-
 
   if(
     !newSettings.wmText ||
@@ -1396,16 +1175,13 @@ function saveSettings(){
     !newSettings.footerPhone
   ){
 
-    showError(
+    error(
       "Please fill in all three fields."
     );
 
     return;
 
   }
-
-
-  clearError();
 
 
   settings =
@@ -1416,29 +1192,153 @@ function saveSettings(){
 
     localStorage.setItem(
       "watermark-settings",
-      JSON.stringify(
-        settings
-      )
+      JSON.stringify(settings)
     );
 
-  }catch(error){
+  }catch(e){
 
     console.warn(
-      "Could not save settings:",
-      error
+      "Unable to save settings",
+      e
     );
 
   }
 
 
-  showSavedDetails();
+  clearError();
+
+
+  document.getElementById(
+    "summaryName"
+  ).textContent =
+    settings.footerName;
+
+
+  document.getElementById(
+    "summaryPhone"
+  ).textContent =
+    settings.footerPhone;
+
+
+  setupCard.classList.add(
+    "hidden"
+  );
+
+  summaryCard.classList.remove(
+    "hidden"
+  );
+
+  uploadZone.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+function loadDetails(){
+
+  try{
+
+    const saved =
+      localStorage.getItem(
+        "watermark-settings"
+      );
+
+
+    if(!saved){
+
+      return;
+
+    }
+
+
+    const parsed =
+      JSON.parse(saved);
+
+
+    if(
+      !parsed ||
+      !parsed.wmText ||
+      !parsed.footerName ||
+      !parsed.footerPhone
+    ){
+
+      return;
+
+    }
+
+
+    settings = {
+
+      wmText:
+        String(parsed.wmText),
+
+      watermarkFont:
+        parsed.watermarkFont ||
+        "TimesRomanItalic",
+
+      footerName:
+        String(parsed.footerName),
+
+      footerPhone:
+        String(parsed.footerPhone)
+
+    };
+
+
+    wmTextInput.value =
+      settings.wmText;
+
+    watermarkFontInput.value =
+      settings.watermarkFont;
+
+    footerNameInput.value =
+      settings.footerName;
+
+    footerPhoneInput.value =
+      settings.footerPhone;
+
+
+    document.getElementById(
+      "summaryName"
+    ).textContent =
+      settings.footerName;
+
+
+    document.getElementById(
+      "summaryPhone"
+    ).textContent =
+      settings.footerPhone;
+
+
+    setupCard.classList.add(
+      "hidden"
+    );
+
+    summaryCard.classList.remove(
+      "hidden"
+    );
+
+    uploadZone.classList.remove(
+      "hidden"
+    );
+
+
+  }catch(e){
+
+    console.warn(
+      "Unable to load settings",
+      e
+    );
+
+  }
 
 }
 
 
 saveSettingsBtn.addEventListener(
   "click",
-  saveSettings
+  saveDetails
 );
 
 
@@ -1448,7 +1348,17 @@ editSettingsBtn.addEventListener(
 
     clearError();
 
-    showSetup();
+    setupCard.classList.remove(
+      "hidden"
+    );
+
+    summaryCard.classList.add(
+      "hidden"
+    );
+
+    uploadZone.classList.add(
+      "hidden"
+    );
 
   }
 );
@@ -1458,12 +1368,9 @@ editSettingsBtn.addEventListener(
    FILE PICKER
 ===================================================== */
 
-function openFilePicker(){
+function chooseFile(){
 
-  if(
-    fileInput.disabled ||
-    isProcessing
-  ){
+  if(processing){
 
     return;
 
@@ -1477,7 +1384,7 @@ function openFilePicker(){
 
 uploadZone.addEventListener(
   "click",
-  openFilePicker
+  chooseFile
 );
 
 
@@ -1492,121 +1399,21 @@ uploadZone.addEventListener(
 
       event.preventDefault();
 
-      openFilePicker();
+      chooseFile();
 
     }
 
   }
 );
 
-
-/* =====================================================
-   DRAG & DROP UPLOAD
-===================================================== */
-
-["dragenter","dragover"]
-.forEach(
-  eventName => {
-
-    uploadZone.addEventListener(
-      eventName,
-      event => {
-
-        if(
-          fileInput.disabled ||
-          isProcessing
-        ){
-
-          return;
-
-        }
-
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-        uploadZone.classList.add(
-          "dragover"
-        );
-
-      }
-    );
-
-  }
-);
-
-
-["dragleave","dragend"]
-.forEach(
-  eventName => {
-
-    uploadZone.addEventListener(
-      eventName,
-      event => {
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-        uploadZone.classList.remove(
-          "dragover"
-        );
-
-      }
-    );
-
-  }
-);
-
-
-uploadZone.addEventListener(
-  "drop",
-  event => {
-
-    event.preventDefault();
-
-    event.stopPropagation();
-
-    uploadZone.classList.remove(
-      "dragover"
-    );
-
-
-    if(
-      fileInput.disabled ||
-      isProcessing
-    ){
-
-      return;
-
-    }
-
-
-    const file =
-      event.dataTransfer?.files?.[0];
-
-
-    if(file){
-
-      handleFile(file);
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   FILE INPUT
-===================================================== */
 
 fileInput.addEventListener(
   "change",
   event => {
 
     const file =
-      event.target.files?.[0];
+      event.target.files &&
+      event.target.files[0];
 
 
     fileInput.value =
@@ -1624,19 +1431,72 @@ fileInput.addEventListener(
 
 
 /* =====================================================
-   FILE VALIDATION
+   UPLOAD DRAG & DROP
 ===================================================== */
 
-function isPdfFile(file){
+uploadZone.addEventListener(
+  "dragover",
+  event => {
 
-  if(!file){
+    event.preventDefault();
 
-    return false;
+    uploadZone.classList.add(
+      "dragover"
+    );
 
   }
+);
 
+
+uploadZone.addEventListener(
+  "dragleave",
+  event => {
+
+    event.preventDefault();
+
+    uploadZone.classList.remove(
+      "dragover"
+    );
+
+  }
+);
+
+
+uploadZone.addEventListener(
+  "drop",
+  event => {
+
+    event.preventDefault();
+
+    uploadZone.classList.remove(
+      "dragover"
+    );
+
+
+    const file =
+      event.dataTransfer &&
+      event.dataTransfer.files &&
+      event.dataTransfer.files[0];
+
+
+    if(file){
+
+      handleFile(file);
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   FILE CHECK
+===================================================== */
+
+function isPdf(file){
 
   return (
+    file &&
     typeof file.name === "string" &&
     file.name
       .toLowerCase()
@@ -1647,24 +1507,21 @@ function isPdfFile(file){
 
 
 /* =====================================================
-   HANDLE FILE
+   HANDLE PDF
 ===================================================== */
 
 async function handleFile(file){
 
-  if(
-    !file ||
-    isProcessing
-  ){
+  if(processing){
 
     return;
 
   }
 
 
-  if(!isPdfFile(file)){
+  if(!isPdf(file)){
 
-    showError(
+    error(
       "Please choose a PDF file."
     );
 
@@ -1675,55 +1532,23 @@ async function handleFile(file){
 
   if(!settings){
 
-    showError(
+    error(
       "Please save your details first."
     );
-
-    showSetup();
 
     return;
 
   }
+
+
+  processing = true;
+
+  clearError();
 
 
   uploadZone.classList.add(
     "hidden"
   );
-
-
-  await processPdf(file);
-
-}
-
-
-/* =====================================================
-   PROCESS PDF
-===================================================== */
-
-async function processPdf(file){
-
-  if(
-    !PDFLibReady ||
-    !PDFJSReady
-  ){
-
-    uploadZone.classList.remove(
-      "hidden"
-    );
-
-    showError(
-      "The PDF engine did not load. Please refresh the page and try again."
-    );
-
-    return;
-
-  }
-
-
-  isProcessing =
-    true;
-
-  clearError();
 
 
   workingCard.classList.remove(
@@ -1733,20 +1558,29 @@ async function processPdf(file){
 
   try{
 
-    await waitForLayout();
-
-
-    const bytes =
+    const buffer =
       await file.arrayBuffer();
 
 
+    /*
+      Keep a clean copy of the original PDF.
+    */
     originalPdfBytes =
-      new Uint8Array(
-        bytes
-      );
+      new Uint8Array(buffer);
 
 
-    watermarkSettings = {
+    currentFileName =
+      file.name.replace(
+        /\.pdf$/i,
+        ""
+      ) +
+      " - stamped.pdf";
+
+
+    /*
+      Reset editor.
+    */
+    watermark = {
 
       x:0.5,
       y:0.5,
@@ -1760,7 +1594,7 @@ async function processPdf(file){
     };
 
 
-    footerSettings = {
+    footer = {
 
       x:0.94,
       y:0.075,
@@ -1776,25 +1610,12 @@ async function processPdf(file){
       "watermark";
 
 
-    currentFileName =
-      file.name.replace(
-        /\.pdf$/i,
-        ""
-      ) +
-      " - stamped.pdf";
-
-
-    hasUnappliedChanges =
-      true;
-
-
     /*
-      Show editor BEFORE measuring it.
+      Show editor BEFORE rendering.
     */
     workingCard.classList.add(
       "hidden"
     );
-
 
     resultCard.classList.remove(
       "hidden"
@@ -1814,27 +1635,24 @@ async function processPdf(file){
     updateEditorUI();
 
 
-    await waitForLayout();
+    await nextFrames();
 
 
-    await renderInteractivePreview(
+    await renderPreview(
       originalPdfBytes
     );
 
 
-    await waitForLayout();
+    updateWatermarkPreview();
+
+    updateFooterPreview();
 
 
-    updateWatermarkOverlay();
-
-    updateFooterOverlay();
-
-
-  }catch(error){
+  }catch(e){
 
     console.error(
-      "Preview error:",
-      error
+      "PDF error:",
+      e
     );
 
 
@@ -1842,26 +1660,22 @@ async function processPdf(file){
       "hidden"
     );
 
-
     resultCard.classList.add(
       "hidden"
     );
-
 
     uploadZone.classList.remove(
       "hidden"
     );
 
 
-    showError(
-      getPdfErrorMessage(error)
+    error(
+      getErrorMessage(e)
     );
-
 
   }finally{
 
-    isProcessing =
-      false;
+    processing = false;
 
   }
 
@@ -1869,10 +1683,10 @@ async function processPdf(file){
 
 
 /* =====================================================
-   LAYOUT
+   WAIT FOR LAYOUT
 ===================================================== */
 
-function waitForLayout(){
+function nextFrames(){
 
   return new Promise(
     resolve => {
@@ -1897,35 +1711,14 @@ function waitForLayout(){
    TABS
 ===================================================== */
 
-function getSelectedSettings(){
-
-  return selectedElement === "watermark"
-    ? watermarkSettings
-    : footerSettings;
-
-}
-
-
-function selectElement(
-  element
-){
-
-  selectedElement =
-    element;
-
-
-  updateEditorUI();
-
-}
-
-
 watermarkTab.addEventListener(
   "click",
   () => {
 
-    selectElement(
-      "watermark"
-    );
+    selectedElement =
+      "watermark";
+
+    updateEditorUI();
 
   }
 );
@@ -1935,23 +1728,16 @@ footerTab.addEventListener(
   "click",
   () => {
 
-    selectElement(
-      "footer"
-    );
+    selectedElement =
+      "footer";
+
+    updateEditorUI();
 
   }
 );
 
 
-/* =====================================================
-   EDITOR UI
-===================================================== */
-
 function updateEditorUI(){
-
-  const current =
-    getSelectedSettings();
-
 
   watermarkTab.classList.toggle(
     "active",
@@ -1971,6 +1757,12 @@ function updateEditorUI(){
       : "Editing: Footer";
 
 
+  const current =
+    selectedElement === "watermark"
+      ? watermark
+      : footer;
+
+
   sizeSlider.value =
     Math.round(
       current.scale * 100
@@ -1978,9 +1770,10 @@ function updateEditorUI(){
 
 
   sizeValue.textContent =
-    `${Math.round(
+    Math.round(
       current.scale * 100
-    )}%`;
+    ) +
+    "%";
 
 
   rotationSlider.value =
@@ -1988,13 +1781,10 @@ function updateEditorUI(){
 
 
   rotationValue.textContent =
-    `${current.rotation}°`;
+    current.rotation +
+    "°";
 
 
-  /*
-    Keep centered is only for
-    watermark.
-  */
   watermarkCenterRow.classList.toggle(
     "hidden",
     selectedElement !== "watermark"
@@ -2002,84 +1792,20 @@ function updateEditorUI(){
 
 
   centerToggle.checked =
-    selectedElement === "watermark"
-      ? watermarkSettings.centered
-      : false;
+    selectedElement === "watermark" &&
+    watermark.centered;
 
 
-  updateOverlayAppearance();
+  updateOverlaySelection();
 
-  updateWatermarkOverlay();
+  updateWatermarkPreview();
 
-  updateFooterOverlay();
-
-}
-
-
-/* =====================================================
-   WATERMARK FONT
-===================================================== */
-
-function getWatermarkFontFamily(){
-
-  const font =
-    settings?.watermarkFont ||
-    "TimesRomanItalic";
-
-
-  if(
-    font === "Helvetica" ||
-    font === "HelveticaOblique"
-  ){
-
-    return "Arial, Helvetica, sans-serif";
-
-  }
-
-
-  if(
-    font === "Courier" ||
-    font === "CourierOblique"
-  ){
-
-    return "\"Courier New\", Courier, monospace";
-
-  }
-
-
-  return "Georgia, \"Times New Roman\", serif";
+  updateFooterPreview();
 
 }
 
 
-function isItalicFont(){
-
-  if(!settings){
-
-    return true;
-
-  }
-
-
-  return (
-    settings.watermarkFont ===
-      "TimesRomanItalic" ||
-
-    settings.watermarkFont ===
-      "HelveticaOblique" ||
-
-    settings.watermarkFont ===
-      "CourierOblique"
-  );
-
-}
-
-
-/* =====================================================
-   OVERLAY APPEARANCE
-===================================================== */
-
-function updateOverlayAppearance(){
+function updateOverlaySelection(){
 
   watermarkOverlay.classList.toggle(
     "selected",
@@ -2095,7 +1821,59 @@ function updateOverlayAppearance(){
 
   watermarkOverlay.classList.toggle(
     "locked",
-    watermarkSettings.centered
+    watermark.centered
+  );
+
+}
+
+
+/* =====================================================
+   WATERMARK FONT
+===================================================== */
+
+function getCssWatermarkFont(){
+
+  const key =
+    settings?.watermarkFont ||
+    "TimesRomanItalic";
+
+
+  if(
+    key === "Helvetica" ||
+    key === "HelveticaOblique"
+  ){
+
+    return "Arial, Helvetica, sans-serif";
+
+  }
+
+
+  if(
+    key === "Courier" ||
+    key === "CourierOblique"
+  ){
+
+    return "\"Courier New\", monospace";
+
+  }
+
+
+  return "Georgia, \"Times New Roman\", serif";
+
+}
+
+
+function watermarkItalic(){
+
+  const key =
+    settings?.watermarkFont ||
+    "TimesRomanItalic";
+
+
+  return (
+    key === "TimesRomanItalic" ||
+    key === "HelveticaOblique" ||
+    key === "CourierOblique"
   );
 
 }
@@ -2105,7 +1883,7 @@ function updateOverlayAppearance(){
    WATERMARK PREVIEW
 ===================================================== */
 
-function updateWatermarkOverlay(){
+function updateWatermarkPreview(){
 
   if(
     !settings ||
@@ -2125,21 +1903,28 @@ function updateWatermarkOverlay(){
     previewCanvasWrap.clientHeight;
 
 
+  if(watermark.centered){
+
+    watermark.x =
+      0.5;
+
+    watermark.y =
+      0.5;
+
+  }
+
+
   const centerX =
-    watermarkSettings.centered
-      ? width / 2
-      : watermarkSettings.x *
-        width;
+    watermark.x *
+    width;
 
 
   const centerY =
-    watermarkSettings.centered
-      ? height / 2
-      : (1 - watermarkSettings.y) *
-        height;
+    (1 - watermark.y) *
+    height;
 
 
-  const shortestSide =
+  const shortest =
     Math.min(
       width,
       height
@@ -2147,9 +1932,9 @@ function updateWatermarkOverlay(){
 
 
   const fontSize =
-    shortestSide *
+    shortest *
     0.16 *
-    watermarkSettings.scale;
+    watermark.scale;
 
 
   watermarkOverlay.textContent =
@@ -2157,17 +1942,17 @@ function updateWatermarkOverlay(){
 
 
   watermarkOverlay.style.fontFamily =
-    getWatermarkFontFamily();
+    getCssWatermarkFont();
 
 
   watermarkOverlay.style.fontStyle =
-    isItalicFont()
+    watermarkItalic()
       ? "italic"
       : "normal";
 
 
   watermarkOverlay.style.fontSize =
-    `${fontSize}px`;
+    fontSize + "px";
 
 
   watermarkOverlay.style.fontWeight =
@@ -2175,23 +1960,17 @@ function updateWatermarkOverlay(){
 
 
   watermarkOverlay.style.left =
-    `${centerX}px`;
+    centerX + "px";
 
 
   watermarkOverlay.style.top =
-    `${centerY}px`;
+    centerY + "px";
 
 
-  /*
-    Browser preview rotation.
-    This is the rotation value the user sees.
-  */
   watermarkOverlay.style.transform =
-    `translate(-50%, -50%) rotate(${watermarkSettings.rotation}deg)`;
-
-
-  watermarkOverlay.style.transformOrigin =
-    "center center";
+    "translate(-50%,-50%) rotate(" +
+    watermark.rotation +
+    "deg)";
 
 
   watermarkOverlay.style.display =
@@ -2204,7 +1983,7 @@ function updateWatermarkOverlay(){
    FOOTER PREVIEW
 ===================================================== */
 
-function updateFooterOverlay(){
+function updateFooterPreview(){
 
   if(
     !settings ||
@@ -2225,16 +2004,16 @@ function updateFooterOverlay(){
 
 
   const centerX =
-    footerSettings.x *
+    footer.x *
     width;
 
 
   const centerY =
-    (1 - footerSettings.y) *
+    (1 - footer.y) *
     height;
 
 
-  const shortestSide =
+  const shortest =
     Math.min(
       width,
       height
@@ -2244,9 +2023,9 @@ function updateFooterOverlay(){
   const nameSize =
     Math.max(
       8,
-      shortestSide *
+      shortest *
       0.028 *
-      footerSettings.scale
+      footer.scale
     );
 
 
@@ -2267,27 +2046,25 @@ function updateFooterOverlay(){
 
 
   footerNamePreview.style.fontSize =
-    `${nameSize}px`;
+    nameSize + "px";
 
 
   footerPhonePreview.style.fontSize =
-    `${phoneSize}px`;
+    phoneSize + "px";
 
 
   footerOverlay.style.left =
-    `${centerX}px`;
+    centerX + "px";
 
 
   footerOverlay.style.top =
-    `${centerY}px`;
+    centerY + "px";
 
 
   footerOverlay.style.transform =
-    `translate(-50%, -50%) rotate(${footerSettings.rotation}deg)`;
-
-
-  footerOverlay.style.transformOrigin =
-    "center center";
+    "translate(-50%,-50%) rotate(" +
+    footer.rotation +
+    "deg)";
 
 
   footerOverlay.style.display =
@@ -2305,7 +2082,9 @@ sizeSlider.addEventListener(
   () => {
 
     const current =
-      getSelectedSettings();
+      selectedElement === "watermark"
+        ? watermark
+        : footer;
 
 
     current.scale =
@@ -2315,25 +2094,26 @@ sizeSlider.addEventListener(
 
 
     sizeValue.textContent =
-      `${Math.round(
+      Math.round(
         current.scale * 100
-      )}%`;
+      ) +
+      "%";
 
 
     if(
       selectedElement === "watermark"
     ){
 
-      updateWatermarkOverlay();
+      updateWatermarkPreview();
 
     }else{
 
-      updateFooterOverlay();
+      updateFooterPreview();
 
     }
 
 
-    markEditorModified();
+    markChanged();
 
   }
 );
@@ -2341,6 +2121,10 @@ sizeSlider.addEventListener(
 
 /* =====================================================
    ROTATION
+
+   IMPORTANT:
+   This slider is the user's visual
+   rotation value: 0 -> 360.
 ===================================================== */
 
 rotationSlider.addEventListener(
@@ -2348,7 +2132,9 @@ rotationSlider.addEventListener(
   () => {
 
     const current =
-      getSelectedSettings();
+      selectedElement === "watermark"
+        ? watermark
+        : footer;
 
 
     current.rotation =
@@ -2358,23 +2144,24 @@ rotationSlider.addEventListener(
 
 
     rotationValue.textContent =
-      `${current.rotation}°`;
+      current.rotation +
+      "°";
 
 
     if(
       selectedElement === "watermark"
     ){
 
-      updateWatermarkOverlay();
+      updateWatermarkPreview();
 
     }else{
 
-      updateFooterOverlay();
+      updateFooterPreview();
 
     }
 
 
-    markEditorModified();
+    markChanged();
 
   }
 );
@@ -2397,18 +2184,18 @@ centerToggle.addEventListener(
     }
 
 
-    watermarkSettings.centered =
+    watermark.centered =
       centerToggle.checked;
 
 
     if(
-      watermarkSettings.centered
+      watermark.centered
     ){
 
-      watermarkSettings.x =
+      watermark.x =
         0.5;
 
-      watermarkSettings.y =
+      watermark.y =
         0.5;
 
     }
@@ -2416,7 +2203,7 @@ centerToggle.addEventListener(
 
     updateEditorUI();
 
-    markEditorModified();
+    markChanged();
 
   }
 );
@@ -2426,13 +2213,13 @@ centerToggle.addEventListener(
    DRAGGING
 ===================================================== */
 
-function startElementDrag(
-  elementName,
+function startDrag(
+  type,
   event
 ){
 
   if(
-    selectedElement !== elementName
+    selectedElement !== type
   ){
 
     return;
@@ -2441,8 +2228,8 @@ function startElementDrag(
 
 
   if(
-    elementName === "watermark" &&
-    watermarkSettings.centered
+    type === "watermark" &&
+    watermark.centered
   ){
 
     return;
@@ -2455,16 +2242,19 @@ function startElementDrag(
   event.stopPropagation();
 
 
-  const overlay =
-    elementName === "watermark"
+  const element =
+    type === "watermark"
       ? watermarkOverlay
       : footerOverlay;
 
 
   const rect =
-    overlay.getBoundingClientRect();
+    element.getBoundingClientRect();
 
 
+  /*
+    Preserve the exact point grabbed.
+  */
   dragOffsetX =
     event.clientX -
     (
@@ -2481,39 +2271,34 @@ function startElementDrag(
     );
 
 
-  draggingElement =
-    elementName;
+  dragging =
+    true;
 
-
-  activePointerId =
+  dragPointerId =
     event.pointerId;
 
 
-  overlay.classList.add(
+  element.classList.add(
     "dragging"
   );
 
 
   try{
 
-    overlay.setPointerCapture(
+    element.setPointerCapture(
       event.pointerId
     );
 
-  }catch(error){
-
-    /* Safe to ignore */
-
-  }
+  }catch(e){}
 
 }
 
 
-function moveElementDrag(event){
+function moveDrag(event){
 
   if(
-    !draggingElement ||
-    event.pointerId !== activePointerId
+    !dragging ||
+    event.pointerId !== dragPointerId
   ){
 
     return;
@@ -2538,88 +2323,91 @@ function moveElementDrag(event){
   }
 
 
-  const current =
-    draggingElement === "watermark"
-      ? watermarkSettings
-      : footerSettings;
-
-
-  let centerX =
-    event.clientX -
-    rect.left -
-    dragOffsetX;
-
-
-  let centerY =
-    event.clientY -
-    rect.top -
-    dragOffsetY;
-
-
-  let normalizedX =
-    centerX /
+  let x =
+    (
+      event.clientX -
+      rect.left -
+      dragOffsetX
+    ) /
     rect.width;
 
 
-  let normalizedTopY =
-    centerY /
+  let topY =
+    (
+      event.clientY -
+      rect.top -
+      dragOffsetY
+    ) /
     rect.height;
 
 
-  normalizedX =
+  x =
     Math.max(
       0,
       Math.min(
         1,
-        normalizedX
+        x
       )
     );
 
 
-  normalizedTopY =
+  topY =
     Math.max(
       0,
       Math.min(
         1,
-        normalizedTopY
+        topY
       )
     );
+
+
+  const y =
+    1 - topY;
+
+
+  const current =
+    draggingElementType();
 
 
   current.x =
-    normalizedX;
-
+    x;
 
   current.y =
-    1 -
-    normalizedTopY;
+    y;
 
 
   if(
-    draggingElement === "watermark"
+    selectedElement === "watermark"
   ){
 
-    updateWatermarkOverlay();
+    updateWatermarkPreview();
 
   }else{
 
-    updateFooterOverlay();
+    updateFooterPreview();
 
   }
 
 
-  markEditorModified();
+  markChanged();
 
 }
 
 
-function stopElementDrag(
-  event
-){
+function draggingElementType(){
+
+  return selectedElement === "watermark"
+    ? watermark
+    : footer;
+
+}
+
+
+function stopDrag(event){
 
   if(
-    activePointerId !== null &&
-    event.pointerId !== activePointerId
+    dragPointerId !== null &&
+    event.pointerId !== dragPointerId
   ){
 
     return;
@@ -2627,38 +2415,40 @@ function stopElementDrag(
   }
 
 
-  const overlay =
-    draggingElement === "watermark"
-      ? watermarkOverlay
-      : footerOverlay;
+  watermarkOverlay.classList.remove(
+    "dragging"
+  );
+
+  footerOverlay.classList.remove(
+    "dragging"
+  );
 
 
-  if(overlay){
+  try{
 
-    overlay.classList.remove(
-      "dragging"
-    );
+    if(
+      selectedElement === "watermark"
+    ){
 
-
-    try{
-
-      overlay.releasePointerCapture(
+      watermarkOverlay.releasePointerCapture(
         event.pointerId
       );
 
-    }catch(error){
+    }else{
 
-      /* Safe to ignore */
+      footerOverlay.releasePointerCapture(
+        event.pointerId
+      );
 
     }
 
-  }
+  }catch(e){}
 
 
-  draggingElement =
-    null;
+  dragging =
+    false;
 
-  activePointerId =
+  dragPointerId =
     null;
 
   dragOffsetX =
@@ -2672,107 +2462,88 @@ function stopElementDrag(
 
 watermarkOverlay.addEventListener(
   "pointerdown",
-  event => {
-
-    startElementDrag(
+  event =>
+    startDrag(
       "watermark",
       event
-    );
-
-  }
+    )
 );
 
 
 footerOverlay.addEventListener(
   "pointerdown",
-  event => {
-
-    startElementDrag(
+  event =>
+    startDrag(
       "footer",
       event
-    );
-
-  }
+    )
 );
 
 
 watermarkOverlay.addEventListener(
   "pointermove",
-  moveElementDrag
+  moveDrag
 );
-
 
 footerOverlay.addEventListener(
   "pointermove",
-  moveElementDrag
+  moveDrag
 );
 
 
 watermarkOverlay.addEventListener(
   "pointerup",
-  stopElementDrag
+  stopDrag
 );
-
 
 footerOverlay.addEventListener(
   "pointerup",
-  stopElementDrag
+  stopDrag
 );
 
 
 watermarkOverlay.addEventListener(
   "pointercancel",
-  stopElementDrag
+  stopDrag
 );
-
 
 footerOverlay.addEventListener(
   "pointercancel",
-  stopElementDrag
+  stopDrag
 );
 
 
 /* =====================================================
-   PDF PREVIEW
+   PDF.JS PREVIEW
 ===================================================== */
 
-async function renderInteractivePreview(
-  pdfBytes
-){
+async function renderPreview(bytes){
 
-  await destroyPreviewPdf();
+  await destroyPreview();
 
 
-  const data =
-    new Uint8Array(
-      pdfBytes
-    );
+  const loadingTask =
+    pdfjsLib.getDocument({
+      data:new Uint8Array(bytes)
+    });
 
 
-  previewPdfDocument =
-    await pdfjsLib
-      .getDocument({
-        data:data
-      })
-      .promise;
+  previewPdf =
+    await loadingTask.promise;
 
 
   previewPage =
-    await previewPdfDocument.getPage(
+    await previewPdf.getPage(
       1
     );
 
 
-  await drawPreviewPage();
+  await drawPreview();
 
 }
 
 
-/* =====================================================
-   DRAW PREVIEW PAGE
-===================================================== */
-
-async function drawPreviewPage(){
+async function drawPreview(){
 
   if(!previewPage){
 
@@ -2781,30 +2552,30 @@ async function drawPreviewPage(){
   }
 
 
-  let width =
+  let containerWidth =
     pdfPreviewContainer.clientWidth;
 
 
   if(
-    !width ||
-    width < 50
+    !containerWidth ||
+    containerWidth < 50
   ){
 
-    await waitForLayout();
+    await nextFrames();
 
-    width =
+    containerWidth =
       pdfPreviewContainer.clientWidth;
 
   }
 
 
   if(
-    !width ||
-    width < 50
+    !containerWidth ||
+    containerWidth < 50
   ){
 
     throw new Error(
-      "Preview container has no usable width."
+      "Unable to size PDF preview."
     );
 
   }
@@ -2816,16 +2587,14 @@ async function drawPreviewPage(){
     });
 
 
-  const availableWidth =
-    Math.max(
-      width - 20,
-      100
-    );
-
-
   const scale =
-    availableWidth /
-    baseViewport.width;
+    Math.max(
+      0.5,
+      (
+        containerWidth - 20
+      ) /
+      baseViewport.width
+    );
 
 
   const viewport =
@@ -2834,54 +2603,54 @@ async function drawPreviewPage(){
     });
 
 
-  const deviceScale =
+  const dpr =
     Math.min(
       window.devicePixelRatio || 1,
       2
     );
 
 
-  pdfPreviewCanvas.width =
+  previewCanvas.width =
     Math.ceil(
       viewport.width *
-      deviceScale
+      dpr
     );
 
 
-  pdfPreviewCanvas.height =
+  previewCanvas.height =
     Math.ceil(
       viewport.height *
-      deviceScale
+      dpr
     );
 
 
-  pdfPreviewCanvas.style.width =
-    `${viewport.width}px`;
+  previewCanvas.style.width =
+    viewport.width + "px";
 
 
-  pdfPreviewCanvas.style.height =
-    `${viewport.height}px`;
+  previewCanvas.style.height =
+    viewport.height + "px";
 
 
   previewCanvasWrap.style.width =
-    `${viewport.width}px`;
+    viewport.width + "px";
 
 
   previewCanvasWrap.style.height =
-    `${viewport.height}px`;
+    viewport.height + "px";
 
 
-  pdfPreviewContext.setTransform(
-    deviceScale,
+  previewContext.setTransform(
+    dpr,
     0,
     0,
-    deviceScale,
+    dpr,
     0,
     0
   );
 
 
-  pdfPreviewContext.clearRect(
+  previewContext.clearRect(
     0,
     0,
     viewport.width,
@@ -2892,47 +2661,34 @@ async function drawPreviewPage(){
   await previewPage.render({
 
     canvasContext:
-      pdfPreviewContext,
+      previewContext,
 
     viewport:viewport
 
   }).promise;
 
 
-  updateWatermarkOverlay();
+  updateWatermarkPreview();
 
-  updateFooterOverlay();
+  updateFooterPreview();
 
 }
 
 
-/* =====================================================
-   DESTROY PREVIEW
-===================================================== */
+async function destroyPreview(){
 
-async function destroyPreviewPdf(){
-
-  if(
-    previewPdfDocument
-  ){
+  if(previewPdf){
 
     try{
 
-      await previewPdfDocument.destroy();
+      await previewPdf.destroy();
 
-    }catch(error){
-
-      console.warn(
-        "Preview cleanup warning:",
-        error
-      );
-
-    }
+    }catch(e){}
 
   }
 
 
-  previewPdfDocument =
+  previewPdf =
     null;
 
   previewPage =
@@ -2945,85 +2701,64 @@ async function destroyPreviewPdf(){
    PDF FONT
 ===================================================== */
 
-function getWatermarkFont(
-  fontKey
-){
+function getPdfFont(fontKey){
 
-  const fontMap = {
+  switch(fontKey){
 
-    TimesRomanItalic:
-      StandardFonts.TimesRomanItalic,
+    case "HelveticaOblique":
+      return StandardFonts.HelveticaOblique;
 
-    HelveticaOblique:
-      StandardFonts.HelveticaOblique,
+    case "CourierOblique":
+      return StandardFonts.CourierOblique;
 
-    CourierOblique:
-      StandardFonts.CourierOblique,
+    case "TimesRoman":
+      return StandardFonts.TimesRoman;
 
-    TimesRoman:
-      StandardFonts.TimesRoman,
+    case "Helvetica":
+      return StandardFonts.Helvetica;
 
-    Helvetica:
-      StandardFonts.Helvetica,
+    case "Courier":
+      return StandardFonts.Courier;
 
-    Courier:
-      StandardFonts.Courier
+    case "TimesRomanItalic":
+    default:
+      return StandardFonts.TimesRomanItalic;
 
-  };
-
-
-  return (
-    fontMap[fontKey] ||
-    StandardFonts.TimesRomanItalic
-  );
+  }
 
 }
 
 
 /* =====================================================
-   IMPORTANT ROTATION CONVERSION
+   ROTATION CONVERSION
+
+   Preview uses CSS rotation.
+
+   PDF uses its own coordinate system.
+
+   We convert the USER rotation into the
+   equivalent PDF rotation.
+
+   Example:
+
+     User: 313°
+     PDF:   47°
+
+   The PDF's 47° gives the same visual
+   orientation as the preview's 313°.
 ===================================================== */
 
-/*
-  CSS and PDF coordinates rotate in opposite
-  directions.
-
-  Example:
-
-    Preview: 313°
-
-    PDF equivalent:
-    360 - 313 = 47°
-
-  But PDF coordinates use a bottom-left origin,
-  while the preview uses a top-left origin.
-
-  The correct conversion for the visual
-  orientation is therefore:
-
-      pdfRotation =
-        (360 - cssRotation) % 360
-
-  This means:
-
-    Preview 0   -> PDF 0
-    Preview 90  -> PDF 270
-    Preview 180 -> PDF 180
-    Preview 270 -> PDF 90
-    Preview 313 -> PDF 47
-
-  This makes the exported PDF have the SAME
-  visual orientation as the editor.
-*/
-function previewRotationToPdf(
-  previewRotation
+function toPdfRotation(
+  userRotation
 ){
+
+  const value =
+    Number(userRotation);
+
 
   const normalized =
     (
-      Number(
-        previewRotation
-      ) % 360 +
+      value % 360 +
       360
     ) % 360;
 
@@ -3040,15 +2775,25 @@ function previewRotationToPdf(
    DRAW WATERMARK INTO PDF
 ===================================================== */
 
-function drawWatermarkIntoPdf(
+function drawWatermark(
   page,
   text,
   font,
   fontSize,
   centerX,
   centerY,
-  previewRotation
+  userRotation
 ){
+
+  /*
+    Convert the visual rotation into
+    PDF rotation.
+  */
+  const pdfRotation =
+    toPdfRotation(
+      userRotation
+    );
+
 
   const textWidth =
     font.widthOfTextAtSize(
@@ -3057,176 +2802,39 @@ function drawWatermarkIntoPdf(
     );
 
 
-  const textHeight =
-    typeof font.heightAtSize ===
-      "function"
-      ? font.heightAtSize(
-          fontSize
-        )
-      : fontSize;
-
-
   /*
-    Convert the browser/editor rotation
-    into the corresponding PDF rotation.
+    Keep this calculation deliberately
+    simple and compatible with pdf-lib.
   */
-  const pdfRotation =
-    previewRotationToPdf(
-      previewRotation
-    );
-
-
-  const angle =
-    pdfRotation *
-    Math.PI /
-    180;
-
-
-  const cos =
-    Math.cos(angle);
-
-
-  const sin =
-    Math.sin(angle);
-
-
-  /*
-    pdf-lib uses the text baseline as
-    the drawing origin.
-
-    Approximate the visible text box around
-    that baseline.
-  */
-  const bottom =
-    -textHeight * 0.25;
-
-
-  const top =
-    textHeight * 0.75;
-
-
-  const corners = [
-
-    {
-      x:0,
-      y:bottom
-    },
-
-    {
-      x:textWidth,
-      y:bottom
-    },
-
-    {
-      x:0,
-      y:top
-    },
-
-    {
-      x:textWidth,
-      y:top
-    }
-
-  ];
-
-
-  const rotatedCorners =
-    corners.map(
-      point => ({
-
-        x:
-          point.x * cos -
-          point.y * sin,
-
-        y:
-          point.x * sin +
-          point.y * cos
-
-      })
-    );
-
-
-  const minX =
-    Math.min(
-      ...rotatedCorners.map(
-        point => point.x
-      )
-    );
-
-
-  const maxX =
-    Math.max(
-      ...rotatedCorners.map(
-        point => point.x
-      )
-    );
-
-
-  const minY =
-    Math.min(
-      ...rotatedCorners.map(
-        point => point.y
-      )
-    );
-
-
-  const maxY =
-    Math.max(
-      ...rotatedCorners.map(
-        point => point.y
-      )
-    );
-
-
-  const rotatedCenterX =
-    (
-      minX +
-      maxX
-    ) / 2;
-
-
-  const rotatedCenterY =
-    (
-      minY +
-      maxY
-    ) / 2;
-
-
-  const originX =
+  const x =
     centerX -
-    rotatedCenterX;
+    textWidth / 2;
 
 
-  const originY =
+  const y =
     centerY -
-    rotatedCenterY;
+    fontSize * 0.25;
 
 
   page.drawText(
     text,
     {
 
-      x:
-        originX,
+      x:x,
 
-      y:
-        originY,
+      y:y,
 
-      size:
-        fontSize,
+      size:fontSize,
 
-      font:
-        font,
+      font:font,
 
-      color:
-        rgb(
-          0.55,
-          0.55,
-          0.55
-        ),
+      color:rgb(
+        0.55,
+        0.55,
+        0.55
+      ),
 
-      opacity:
-        0.32,
+      opacity:0.32,
 
       rotate:
         degrees(
@@ -3240,23 +2848,27 @@ function drawWatermarkIntoPdf(
 
 
 /* =====================================================
-   FINAL PDF
+   STAMP PDF
 ===================================================== */
 
 async function stampPdf(
-  arrayBuffer,
+  bytes,
   s
 ){
 
+  /*
+    This is intentionally kept close to
+    the original working pdf-lib code.
+  */
   const pdfDoc =
     await PDFDocument.load(
-      arrayBuffer
+      bytes
     );
 
 
   const watermarkFont =
     await pdfDoc.embedFont(
-      getWatermarkFont(
+      getPdfFont(
         s.watermarkFont
       )
     );
@@ -3282,177 +2894,188 @@ async function stampPdf(
     const page of pages
   ){
 
-    const {
-      width,
-      height
-    } =
+    const size =
       page.getSize();
 
 
-    const shortestSide =
+    const width =
+      size.width;
+
+    const height =
+      size.height;
+
+
+    const shortest =
       Math.min(
         width,
         height
       );
 
 
-    /* =================================================
+    /* ================================================
        WATERMARK
-    ================================================== */
+    ================================================= */
 
-    const watermarkFontSize =
+    const watermarkSize =
       Math.min(
-        shortestSide *
+        shortest *
         0.16 *
-        watermarkSettings.scale,
-
+        watermark.scale,
         150
       );
 
 
     const watermarkCenterX =
-      watermarkSettings.centered
+      watermark.centered
         ? width / 2
-        : watermarkSettings.x *
+        : watermark.x *
           width;
 
 
     const watermarkCenterY =
-      watermarkSettings.centered
+      watermark.centered
         ? height / 2
-        : watermarkSettings.y *
+        : watermark.y *
           height;
 
 
-    drawWatermarkIntoPdf(
+    drawWatermark(
       page,
 
       s.wmText,
 
       watermarkFont,
 
-      watermarkFontSize,
+      watermarkSize,
 
       watermarkCenterX,
 
       watermarkCenterY,
 
-      watermarkSettings.rotation
+      watermark.rotation
     );
 
 
-    /* =================================================
+    /* ================================================
        FOOTER
-    ================================================== */
+    ================================================= */
 
-    const footerNameFontSize =
+    const nameSize =
       Math.max(
         8,
         Math.min(
-          shortestSide *
+          shortest *
           0.028 *
-          footerSettings.scale,
-
+          footer.scale,
           50
         )
       );
 
 
-    const footerPhoneFontSize =
-      Math.max(
-        7,
-        footerNameFontSize *
-        0.82
-      );
+    const phoneSize =
+      nameSize *
+      0.82;
 
 
-    const footerNameWidth =
+    const nameWidth =
       boldFont.widthOfTextAtSize(
         s.footerName,
-        footerNameFontSize
+        nameSize
       );
 
 
-    const footerPhoneWidth =
+    const phoneWidth =
       regularFont.widthOfTextAtSize(
         s.footerPhone,
-        footerPhoneFontSize
+        phoneSize
       );
 
 
-    const footerGroupWidth =
-      Math.max(
-        footerNameWidth,
-        footerPhoneWidth
+    const margin =
+      shortest *
+      0.045;
+
+
+    /*
+      Position footer exactly like
+      the original working version.
+    */
+    let phoneY =
+      footer.y *
+      height -
+      footerSettingsPhoneOffset(
+        phoneSize
       );
 
 
-    const footerGroupHeight =
-      footerNameFontSize +
-      footerPhoneFontSize *
-      1.35;
+    let nameY =
+      phoneY +
+      phoneSize +
+      nameSize * 0.35;
 
 
-    const footerCenterX =
-      footerSettings.x *
+    /*
+      Keep footer near its edited position.
+    */
+    if(
+      footer.y === 0.075 &&
+      footer.x === 0.94
+    ){
+
+      phoneY =
+        margin;
+
+
+      nameY =
+        margin +
+        phoneSize +
+        nameSize * 0.35;
+
+    }
+
+
+    const footerRight =
+      footer.x *
       width;
 
 
-    const footerCenterY =
-      footerSettings.y *
-      height;
+    const nameX =
+      footerRight -
+      nameWidth;
 
 
-    const footerRotation =
-      previewRotationToPdf(
-        footerSettings.rotation
+    const phoneX =
+      footerRight -
+      phoneWidth;
+
+
+    const pdfFooterRotation =
+      toPdfRotation(
+        footer.rotation
       );
 
 
-    /* =================================================
-       FOOTER: 0°
-    ================================================== */
-
     if(
-      footerSettings.rotation === 0
+      footer.rotation === 0
     ){
-
-      const footerLeft =
-        footerCenterX -
-        footerGroupWidth / 2;
-
-
-      const footerBottom =
-        footerCenterY -
-        footerGroupHeight / 2;
-
 
       page.drawText(
         s.footerName,
         {
 
-          x:
-            footerLeft +
-            footerGroupWidth -
-            footerNameWidth,
+          x:nameX,
 
-          y:
-            footerBottom +
-            footerPhoneFontSize *
-            0.95,
+          y:nameY,
 
-          size:
-            footerNameFontSize,
+          size:nameSize,
 
-          font:
-            boldFont,
+          font:boldFont,
 
-          color:
-            rgb(
-              0.1,
-              0.1,
-              0.1
-            )
+          color:rgb(
+            0.1,
+            0.1,
+            0.1
+          )
 
         }
       );
@@ -3462,102 +3085,112 @@ async function stampPdf(
         s.footerPhone,
         {
 
-          x:
-            footerLeft +
-            footerGroupWidth -
-            footerPhoneWidth,
+          x:phoneX,
 
-          y:
-            footerBottom,
+          y:phoneY,
 
-          size:
-            footerPhoneFontSize,
+          size:phoneSize,
 
-          font:
-            regularFont,
+          font:regularFont,
 
-          color:
-            rgb(
-              0.1,
-              0.1,
-              0.1
-            )
+          color:rgb(
+            0.1,
+            0.1,
+            0.1
+          )
 
         }
       );
 
     }else{
 
-      /* =================================================
-         ROTATED FOOTER
-      ================================================== */
+      /*
+        Rotate footer around the center
+        of the edited footer block.
+      */
+      const groupWidth =
+        Math.max(
+          nameWidth,
+          phoneWidth
+        );
+
+
+      const groupHeight =
+        nameSize +
+        phoneSize *
+        1.35;
+
+
+      const centerX =
+        footer.x *
+        width;
+
+
+      const centerY =
+        footer.y *
+        height;
+
 
       const angle =
-        footerRotation *
+        pdfFooterRotation *
         Math.PI /
         180;
 
 
       const cos =
-        Math.cos(
-          angle
-        );
+        Math.cos(angle);
 
 
       const sin =
-        Math.sin(
-          angle
-        );
+        Math.sin(angle);
 
 
-      const rotatePoint = (
+      function rotatePoint(
         localX,
         localY
-      ) => {
+      ){
 
-        const x =
+        const dx =
           localX -
-          footerGroupWidth / 2;
+          groupWidth / 2;
 
 
-        const y =
+        const dy =
           localY -
-          footerGroupHeight / 2;
+          groupHeight / 2;
 
 
         return {
 
           x:
-            footerCenterX +
-            x * cos -
-            y * sin,
+            centerX +
+            dx * cos -
+            dy * sin,
 
           y:
-            footerCenterY +
-            x * sin +
-            y * cos
+            centerY +
+            dx * sin +
+            dy * cos
 
         };
 
-      };
+      }
 
 
       const namePoint =
         rotatePoint(
-          footerGroupWidth /
-            2 -
-            footerNameWidth,
+          groupWidth -
+          nameWidth,
 
-          footerPhoneFontSize *
-            0.95
+          phoneSize +
+          nameSize * 0.35
         );
 
 
       const phonePoint =
         rotatePoint(
-          footerGroupWidth /
-            2 -
-            footerPhoneWidth,
+          groupWidth -
+          phoneWidth,
 
           0
         );
@@ -3567,28 +3200,23 @@ async function stampPdf(
         s.footerName,
         {
 
-          x:
-            namePoint.x,
+          x:namePoint.x,
 
-          y:
-            namePoint.y,
+          y:namePoint.y,
 
-          size:
-            footerNameFontSize,
+          size:nameSize,
 
-          font:
-            boldFont,
+          font:boldFont,
 
-          color:
-            rgb(
-              0.1,
-              0.1,
-              0.1
-            ),
+          color:rgb(
+            0.1,
+            0.1,
+            0.1
+          ),
 
           rotate:
             degrees(
-              footerRotation
+              pdfFooterRotation
             )
 
         }
@@ -3599,28 +3227,23 @@ async function stampPdf(
         s.footerPhone,
         {
 
-          x:
-            phonePoint.x,
+          x:phonePoint.x,
 
-          y:
-            phonePoint.y,
+          y:phonePoint.y,
 
-          size:
-            footerPhoneFontSize,
+          size:phoneSize,
 
-          font:
-            regularFont,
+          font:regularFont,
 
-          color:
-            rgb(
-              0.1,
-              0.1,
-              0.1
-            ),
+          color:rgb(
+            0.1,
+            0.1,
+            0.1
+          ),
 
           rotate:
             degrees(
-              footerRotation
+              pdfFooterRotation
             )
 
         }
@@ -3631,7 +3254,19 @@ async function stampPdf(
   }
 
 
-  return await pdfDoc.save();
+  return pdfDoc.save();
+
+}
+
+
+/*
+  Small helper to keep footer math isolated.
+*/
+function footerSettingsPhoneOffset(
+  phoneSize
+){
+
+  return 0;
 
 }
 
@@ -3647,7 +3282,7 @@ applyBtn.addEventListener(
     if(
       !originalPdfBytes ||
       !settings ||
-      isProcessing
+      processing
     ){
 
       return;
@@ -3655,11 +3290,9 @@ applyBtn.addEventListener(
     }
 
 
+    processing = true;
+
     clearError();
-
-
-    isProcessing =
-      true;
 
 
     applyBtn.disabled =
@@ -3671,14 +3304,18 @@ applyBtn.addEventListener(
 
     try{
 
+      /*
+        Make sure centered mode uses
+        the exact page center.
+      */
       if(
-        watermarkSettings.centered
+        watermark.centered
       ){
 
-        watermarkSettings.x =
+        watermark.x =
           0.5;
 
-        watermarkSettings.y =
+        watermark.y =
           0.5;
 
       }
@@ -3729,37 +3366,28 @@ applyBtn.addEventListener(
 
 
       /*
-        The PDF now represents the
-        current editor state.
-      */
-      hasUnappliedChanges =
-        false;
-
-
-      /*
-        Hide Apply Changes.
+        Everything is synchronized now.
       */
       applyBtn.classList.add(
         "hidden"
       );
 
 
-    }catch(error){
+    }catch(e){
 
       console.error(
-        "PDF stamping error:",
-        error
+        "Stamping error:",
+        e
       );
 
 
-      showError(
-        getPdfErrorMessage(error)
+      error(
+        getErrorMessage(e)
       );
 
     }finally{
 
-      isProcessing =
-        false;
+      processing = false;
 
       applyBtn.disabled =
         false;
@@ -3774,6 +3402,60 @@ applyBtn.addEventListener(
 
 
 /* =====================================================
+   ERROR MESSAGE
+===================================================== */
+
+function getErrorMessage(e){
+
+  if(!e){
+
+    return "Couldn't process that PDF. Please try again.";
+
+  }
+
+
+  const msg =
+    String(
+      e.message ||
+      e
+    ).toLowerCase();
+
+
+  if(
+    msg.includes("encrypted") ||
+    msg.includes("password")
+  ){
+
+    return "This PDF is password-protected. Please use an unlocked PDF.";
+
+  }
+
+
+  if(
+    msg.includes("invalid") ||
+    msg.includes("malformed")
+  ){
+
+    return "This PDF appears to be damaged or invalid. Please try another PDF.";
+
+  }
+
+
+  if(
+    msg.includes("memory")
+  ){
+
+    return "This PDF is too large for the browser to process.";
+
+  }
+
+
+  return "Couldn't process that PDF. Please try again.";
+
+}
+
+
+/* =====================================================
    SHARE
 ===================================================== */
 
@@ -3783,16 +3465,13 @@ shareBtn.addEventListener(
 
     if(!currentObjectUrl){
 
-      showError(
+      error(
         "Tap “Apply Changes” first."
       );
 
       return;
 
     }
-
-
-    clearError();
 
 
     try{
@@ -3806,7 +3485,7 @@ shareBtn.addEventListener(
       if(!response.ok){
 
         throw new Error(
-          "Could not read PDF."
+          "Unable to read PDF."
         );
 
       }
@@ -3865,16 +3544,16 @@ shareBtn.addEventListener(
       }
 
 
-      showError(
+      error(
         "Sharing isn't supported in this browser. Use Download PDF instead."
       );
 
 
-    }catch(error){
+    }catch(e){
 
       if(
-        error?.name ===
-        "AbortError"
+        e &&
+        e.name === "AbortError"
       ){
 
         return;
@@ -3882,7 +3561,7 @@ shareBtn.addEventListener(
       }
 
 
-      showError(
+      error(
         "Couldn't open the share menu. You can use Download PDF instead."
       );
 
@@ -3903,7 +3582,7 @@ anotherBtn.addEventListener(
     clearError();
 
 
-    await destroyPreviewPdf();
+    await destroyPreview();
 
 
     if(currentObjectUrl){
@@ -3945,105 +3624,29 @@ anotherBtn.addEventListener(
       "Apply Changes";
 
 
-    hasUnappliedChanges =
-      true;
-
-
-    watermarkSettings = {
-
-      x:0.5,
-      y:0.5,
-
-      scale:1,
-
-      rotation:35,
-
-      centered:false
-
-    };
-
-
-    footerSettings = {
-
-      x:0.94,
-      y:0.075,
-
-      scale:1,
-
-      rotation:0
-
-    };
-
-
-    selectedElement =
-      "watermark";
-
-
-    updateEditorUI();
-
-
     showUpload();
-
-
-    uploadZone.scrollIntoView({
-      behavior:"smooth",
-      block:"center"
-    });
 
   }
 );
 
 
 /* =====================================================
-   ERROR MESSAGE
+   SHOW UPLOAD
 ===================================================== */
 
-function getPdfErrorMessage(error){
+function showUpload(){
 
-  if(!error){
+  setupCard.classList.add(
+    "hidden"
+  );
 
-    return "Couldn't process that PDF. Please try another PDF.";
+  summaryCard.classList.remove(
+    "hidden"
+  );
 
-  }
-
-
-  const message =
-    typeof error.message === "string"
-      ? error.message.toLowerCase()
-      : "";
-
-
-  if(
-    message.includes("encrypted") ||
-    message.includes("password")
-  ){
-
-    return "This PDF is password-protected or encrypted. Please use an unlocked PDF.";
-
-  }
-
-
-  if(
-    message.includes("invalid") ||
-    message.includes("malformed")
-  ){
-
-    return "This PDF appears to be damaged or invalid. Please try another PDF.";
-
-  }
-
-
-  if(
-    message.includes("memory") ||
-    message.includes("out of memory")
-  ){
-
-    return "This PDF is too large or complex for your device to process. Please try a smaller PDF.";
-
-  }
-
-
-  return "Couldn't process that PDF. Please try another PDF.";
+  uploadZone.classList.remove(
+    "hidden"
+  );
 
 }
 
@@ -4052,7 +3655,8 @@ function getPdfErrorMessage(error){
    RESIZE
 ===================================================== */
 
-let resizeTimer = null;
+let resizeTimer =
+  null;
 
 
 window.addEventListener(
@@ -4082,19 +3686,13 @@ window.addEventListener(
 
           try{
 
-            await drawPreviewPage();
+            await drawPreview();
 
-            await waitForLayout();
-
-            updateWatermarkOverlay();
-
-            updateFooterOverlay();
-
-          }catch(error){
+          }catch(e){
 
             console.warn(
-              "Preview resize failed:",
-              error
+              "Preview resize error:",
+              e
             );
 
           }
@@ -4155,17 +3753,15 @@ window.addEventListener(
 
     }
 
-    destroyPreviewPdf();
-
   }
 );
 
 
 /* =====================================================
-   INITIALIZE
+   START
 ===================================================== */
 
-loadSettings();
+loadDetails();
 
 </script>
 
