@@ -86,11 +86,11 @@ input:focus,select:focus{outline:none;border-color:var(--gold)}
 </div>
 </div>
 
-<div class="upload-zone disabled" id="uploadZone" role="button" tabindex="0" aria-label="Choose a PDF">
+<div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Choose a PDF">
 <div class="icon">📄</div>
 <div class="big">Tap to choose a PDF</div>
-<div class="small">You must save your details before choosing a PDF.</div>
-<input type="file" id="fileInput" accept="application/pdf,.pdf" disabled>
+<div class="small">Choose a PDF before or after entering your details.</div>
+<input type="file" id="fileInput" accept="application/pdf,.pdf">
 </div>
 
 <div class="card hidden" id="workingCard">
@@ -137,6 +137,7 @@ const previewBtn=document.getElementById("previewBtn");
 const pdfPreview=document.getElementById("pdfPreview");
 
 let settings=null;
+let pendingFile=null;
 let currentObjectUrl=null;
 let currentFileName="stamped.pdf";
 
@@ -146,8 +147,8 @@ function showOnly(el){
 }
 
 function setUploadEnabled(enabled){
-  fileInput.disabled=!enabled;
-  uploadZone.classList.toggle("disabled",!enabled);
+  fileInput.disabled=false;
+  uploadZone.classList.remove("disabled");
 }
 
 function renderSummary(){
@@ -173,6 +174,12 @@ function saveSettings(){
   try{localStorage.setItem("watermark-settings",JSON.stringify(settings));}catch(e){}
   errorStatus.classList.add("hidden");
   renderSummary();
+
+  if(pendingFile){
+    const fileToProcess=pendingFile;
+    pendingFile=null;
+    handleFile(fileToProcess);
+  }
 }
 
 function loadSettings(){
@@ -189,14 +196,14 @@ function loadSettings(){
     }
   }catch(e){}
   showOnly(setupCard);
-  setUploadEnabled(false);
+  setUploadEnabled(true);
 }
 
 document.getElementById("saveSettingsBtn").addEventListener("click",saveSettings);
 
 document.getElementById("editSettingsBtn").addEventListener("click",()=>{
   showOnly(setupCard);
-  setUploadEnabled(false);
+  setUploadEnabled(true);
 });
 
 function handleFile(file){
@@ -206,13 +213,14 @@ function handleFile(file){
     errorStatus.classList.remove("hidden");
     return;
   }
-  if(!settings){
-    errorStatus.textContent="Please save your details before choosing a PDF.";
+  if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){
+    errorStatus.textContent="That doesn't look like a PDF — please choose a PDF file.";
     errorStatus.classList.remove("hidden");
     return;
   }
-  if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){
-    errorStatus.textContent="That doesn't look like a PDF — please choose a PDF file.";
+  if(!settings){
+    pendingFile=file;
+    errorStatus.textContent="PDF selected. Enter your details and tap Save my details to stamp it.";
     errorStatus.classList.remove("hidden");
     return;
   }
