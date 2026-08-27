@@ -2,10 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1"
+>
 <title>Watermark Tool</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <style>
 :root{
@@ -16,6 +20,7 @@
   --gold:#B08D57;
   --good:#2F6B4F;
   --bad:#A63A3A;
+  --white:#fff;
   --radius:14px;
 }
 
@@ -153,6 +158,7 @@ select:focus{
   font-weight:600;
   cursor:pointer;
   padding:6px;
+  flex-shrink:0;
 }
 
 .upload-zone{
@@ -164,7 +170,10 @@ select:focus{
   text-align:center;
   background:#fff;
   cursor:pointer;
-  transition:border-color .15s,background-color .15s;
+  transition:
+    border-color .15s,
+    background-color .15s,
+    opacity .15s;
   margin-bottom:16px;
   -webkit-tap-highlight-color:transparent;
 }
@@ -226,7 +235,9 @@ select:focus{
   cursor:pointer;
   text-align:center;
   text-decoration:none;
-  transition:opacity .15s,transform .05s;
+  transition:
+    opacity .15s,
+    transform .05s;
 }
 
 .btn:active{
@@ -241,12 +252,6 @@ select:focus{
 .btn-share{
   background:var(--good);
   color:#fff;
-}
-
-.btn-outline{
-  background:#fff;
-  color:var(--ink);
-  border:1.5px solid var(--paper-line);
 }
 
 .btn-secondary{
@@ -290,6 +295,265 @@ select:focus{
   }
 }
 
+
+/* =====================================================
+   EDITOR TABS
+===================================================== */
+
+.editor-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.editor-tab{
+  width:100%;
+  padding:11px 12px;
+  border:1.5px solid var(--paper-line);
+  border-radius:10px;
+  background:#fff;
+  color:var(--ink-soft);
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.editor-tab.active{
+  background:var(--ink);
+  border-color:var(--ink);
+  color:#fff;
+}
+
+
+/* =====================================================
+   PREVIEW
+===================================================== */
+
+.preview-wrap{
+  border:1px solid var(--paper-line);
+  border-radius:12px;
+  overflow:hidden;
+  background:#dcdcdc;
+  margin:12px 0 16px;
+}
+
+#pdfPreviewContainer{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:10px;
+  overflow:hidden;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+#previewCanvasWrap{
+  position:relative;
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+  touch-action:none;
+}
+
+#pdfPreviewCanvas{
+  display:block;
+  width:100%;
+  height:auto;
+  background:#fff;
+  box-shadow:0 1px 5px rgba(0,0,0,.15);
+}
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+.preview-element{
+  position:absolute;
+  z-index:3;
+  transform-origin:center center;
+  user-select:none;
+  -webkit-user-select:none;
+  white-space:nowrap;
+}
+
+#watermarkOverlay{
+  color:rgba(140,140,140,.58);
+  line-height:1;
+  cursor:grab;
+  touch-action:none;
+  padding:0;
+  margin:0;
+}
+
+#watermarkOverlay.dragging{
+  cursor:grabbing;
+}
+
+#footerOverlay{
+  color:rgba(15,15,15,.85);
+  line-height:1.15;
+  text-align:right;
+  cursor:grab;
+  touch-action:none;
+  padding:8px 10px;
+  margin:-8px -10px;
+}
+
+#footerOverlay.dragging{
+  cursor:grabbing;
+}
+
+.footer-name-preview{
+  font-weight:700;
+}
+
+.footer-phone-preview{
+  font-weight:400;
+}
+
+.preview-element.selected{
+  outline:1.5px dashed var(--gold);
+  outline-offset:4px;
+}
+
+.preview-element.locked{
+  cursor:default!important;
+}
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+.preview-controls{
+  background:#fff;
+  border:1px solid var(--paper-line);
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+  margin-bottom:16px;
+}
+
+.preview-controls-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--ink);
+  margin-bottom:5px;
+}
+
+.preview-controls-subtitle{
+  font-size:12px;
+  color:var(--gold);
+  font-weight:600;
+  margin-bottom:8px;
+}
+
+.preview-controls-help{
+  font-size:12px;
+  color:var(--ink-soft);
+  line-height:1.5;
+  margin-bottom:14px;
+}
+
+.control-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:12px;
+}
+
+.control-row:first-of-type{
+  margin-top:0;
+}
+
+.control-label{
+  font-size:13px;
+  color:var(--ink-soft);
+  width:64px;
+  flex-shrink:0;
+}
+
+.control-slider{
+  width:100%;
+  accent-color:var(--gold);
+  cursor:pointer;
+}
+
+.control-value{
+  font-size:13px;
+  font-weight:700;
+  min-width:48px;
+  text-align:right;
+  color:var(--ink);
+}
+
+.center-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid var(--paper-line);
+}
+
+.center-title{
+  font-size:14px;
+  font-weight:600;
+  color:var(--ink);
+}
+
+.toggle{
+  width:48px;
+  height:28px;
+  position:relative;
+  flex-shrink:0;
+}
+
+.toggle input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+
+.toggle-slider{
+  position:absolute;
+  inset:0;
+  background:#d8d5cd;
+  border-radius:999px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.toggle-slider:before{
+  content:"";
+  position:absolute;
+  width:22px;
+  height:22px;
+  left:3px;
+  top:3px;
+  background:#fff;
+  border-radius:50%;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:.2s;
+}
+
+.toggle input:checked + .toggle-slider{
+  background:var(--gold);
+}
+
+.toggle input:checked + .toggle-slider:before{
+  transform:translateX(20px);
+}
+
+
+/* =====================================================
+   RESULT
+===================================================== */
+
 .result{
   text-align:center;
 }
@@ -307,42 +571,14 @@ select:focus{
   word-break:break-all;
 }
 
-.preview-wrap{
-  border:1px solid var(--paper-line);
-  border-radius:12px;
-  overflow:hidden;
-  background:#eee;
-  margin:12px 0 16px;
-}
-
-#pdfPreview{
-  width:100%;
-  height:420px;
-  border:0;
-  display:block;
-  background:#eee;
-}
-
-.preview-note{
-  font-size:12px;
+.preview-error{
+  padding:20px 12px;
+  font-size:13px;
   color:var(--ink-soft);
-  margin:8px 0 0;
-}
-
-.button-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
 }
 
 .hidden{
   display:none!important;
-}
-
-@media(max-width:560px){
-  #pdfPreview{
-    height:360px;
-  }
 }
 </style>
 </head>
@@ -357,7 +593,10 @@ select:focus{
 </header>
 
 
-<!-- DETAILS -->
+<!-- =====================================================
+     YOUR DETAILS
+===================================================== -->
+
 <div class="card" id="setupCard">
 
   <h2>Your details</h2>
@@ -378,24 +617,31 @@ select:focus{
   </label>
 
   <select id="watermarkFont">
+
     <option value="TimesRomanItalic">
       Times New Roman — Italic
     </option>
+
     <option value="HelveticaOblique">
       Helvetica — Italic
     </option>
+
     <option value="CourierOblique">
       Courier — Italic
     </option>
+
     <option value="TimesRoman">
       Times New Roman — Regular
     </option>
+
     <option value="Helvetica">
       Helvetica — Regular
     </option>
+
     <option value="Courier">
       Courier — Regular
     </option>
+
   </select>
 
   <label class="field" for="footerName">
@@ -432,8 +678,14 @@ select:focus{
 </div>
 
 
-<!-- SAVED DETAILS -->
-<div class="card hidden" id="summaryCard">
+<!-- =====================================================
+     SAVED DETAILS
+===================================================== -->
+
+<div
+  class="card hidden"
+  id="summaryCard"
+>
 
   <div class="settings-summary">
 
@@ -455,9 +707,10 @@ select:focus{
 </div>
 
 
-<!-- PDF UPLOAD
-     This is intentionally hidden on the first screen.
--->
+<!-- =====================================================
+     UPLOAD
+===================================================== -->
+
 <div
   class="upload-zone hidden"
   id="uploadZone"
@@ -485,71 +738,274 @@ select:focus{
 </div>
 
 
-<!-- WORKING -->
-<div class="card hidden" id="workingCard">
+<!-- =====================================================
+     WORKING
+===================================================== -->
+
+<div
+  class="card hidden"
+  id="workingCard"
+>
 
   <div class="spinner"></div>
 
-  <div class="status" id="workingStatus">
-    Stamping your PDF…
+  <div
+    class="status"
+    id="workingStatus"
+  >
+    Preparing your PDF…
   </div>
 
 </div>
 
 
-<!-- RESULT -->
-<div class="card hidden" id="resultCard">
+<!-- =====================================================
+     RESULT / EDITOR
+===================================================== -->
+
+<div
+  class="card hidden"
+  id="resultCard"
+>
 
   <div class="result">
 
-    <div class="check">✓</div>
+    <div class="check">
+      ✓
+    </div>
 
     <div class="status">
-      Preview your stamped PDF
+      Adjust your PDF
     </div>
 
-    <div class="fname" id="resultFilename"></div>
+    <div
+      class="fname"
+      id="resultFilename"
+    ></div>
+
+
+    <!-- ELEMENT TABS -->
+
+    <div class="editor-tabs">
+
+      <button
+        class="editor-tab active"
+        id="watermarkTab"
+        type="button"
+      >
+        Watermark
+      </button>
+
+      <button
+        class="editor-tab"
+        id="footerTab"
+        type="button"
+      >
+        Footer
+      </button>
+
+    </div>
+
+
+    <!-- PREVIEW -->
 
     <div class="preview-wrap">
-      <iframe
-        id="pdfPreview"
-        title="Stamped PDF preview"
-      ></iframe>
+
+      <div id="pdfPreviewContainer">
+
+        <div id="previewCanvasWrap">
+
+          <canvas
+            id="pdfPreviewCanvas"
+          ></canvas>
+
+
+          <!-- WATERMARK -->
+
+          <div
+            id="watermarkOverlay"
+            class="preview-element selected"
+          ></div>
+
+
+          <!-- FOOTER -->
+
+          <div
+            id="footerOverlay"
+            class="preview-element"
+          >
+
+            <div
+              class="footer-name-preview"
+              id="footerNamePreview"
+            ></div>
+
+            <div
+              class="footer-phone-preview"
+              id="footerPhonePreview"
+            ></div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="previewError"
+          class="preview-error hidden"
+        >
+          Preview unavailable. You can still download your PDF.
+        </div>
+
+      </div>
+
     </div>
 
-    <p class="preview-note">
-      On some phones, the preview may open in the browser's built-in PDF viewer.
-    </p>
 
-    <div class="button-row">
+    <!-- CONTROLS -->
 
-      <button
-        class="btn btn-outline"
-        id="previewBtn"
-        type="button"
+    <div class="preview-controls">
+
+      <div class="preview-controls-title">
+        Adjust selected element
+      </div>
+
+      <div
+        class="preview-controls-subtitle"
+        id="selectedElementLabel"
       >
-        Open Preview
-      </button>
+        Editing: Watermark
+      </div>
 
-      <button
-        class="btn btn-share"
-        id="shareBtn"
-        type="button"
+      <div class="preview-controls-help">
+        Drag the selected element itself to move it.
+      </div>
+
+
+      <!-- SIZE -->
+
+      <div class="control-row">
+
+        <span class="control-label">
+          Size
+        </span>
+
+        <input
+          type="range"
+          id="sizeSlider"
+          class="control-slider"
+          min="50"
+          max="200"
+          step="1"
+          value="100"
+        >
+
+        <span
+          class="control-value"
+          id="sizeValue"
+        >
+          100%
+        </span>
+
+      </div>
+
+
+      <!-- ROTATION -->
+
+      <div class="control-row">
+
+        <span class="control-label">
+          Rotation
+        </span>
+
+        <input
+          type="range"
+          id="rotationSlider"
+          class="control-slider"
+          min="0"
+          max="360"
+          step="1"
+          value="35"
+        >
+
+        <span
+          class="control-value"
+          id="rotationValue"
+        >
+          35°
+        </span>
+
+      </div>
+
+
+      <!-- WATERMARK ONLY -->
+
+      <div
+        class="center-row"
+        id="watermarkCenterRow"
       >
-        Share PDF
-      </button>
+
+        <div class="center-title">
+          Keep centered
+        </div>
+
+        <label class="toggle">
+
+          <input
+            type="checkbox"
+            id="centerToggle"
+          >
+
+          <span class="toggle-slider"></span>
+
+        </label>
+
+      </div>
 
     </div>
+
+
+    <!-- =================================================
+         BUTTONS
+    ================================================== -->
+
+    <!-- Apply button comes first -->
+
+    <button
+      class="btn btn-primary"
+      id="applyBtn"
+      type="button"
+    >
+      Apply Changes
+    </button>
+
+
+    <!-- Download comes second -->
 
     <a
       href="#"
-      class="btn btn-primary"
+      class="btn btn-primary hidden"
       id="downloadBtn"
       style="margin-top:10px"
       download
     >
       Download PDF
     </a>
+
+
+    <!-- Share comes third -->
+
+    <button
+      class="btn btn-share"
+      id="shareBtn"
+      type="button"
+      style="margin-top:10px"
+    >
+      Share PDF
+    </button>
+
+
+    <!-- Stamp another comes last -->
 
     <button
       class="btn btn-secondary"
@@ -564,7 +1020,10 @@ select:focus{
 </div>
 
 
-<!-- ERROR -->
+<!-- =====================================================
+     ERROR
+===================================================== -->
+
 <div
   class="status error hidden"
   id="errorStatus"
@@ -573,9 +1032,11 @@ select:focus{
 
 
 <noscript>
+
   <div class="status error">
     JavaScript must be enabled for the watermark tool to work.
   </div>
+
 </noscript>
 
 </div>
@@ -585,11 +1046,28 @@ select:focus{
 "use strict";
 
 
-/* =========================================================
-   PDF LIB
-========================================================= */
+/* =====================================================
+   LIBRARY CHECK
+===================================================== */
 
-const PDFLibReady = typeof PDFLib !== "undefined";
+const PDFLibReady =
+  typeof PDFLib !== "undefined";
+
+const PDFJSReady =
+  typeof pdfjsLib !== "undefined";
+
+
+if(PDFJSReady){
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+}
+
+
+/* =====================================================
+   PDF LIB
+===================================================== */
 
 const {
   PDFDocument,
@@ -601,9 +1079,9 @@ const {
   : {};
 
 
-/* =========================================================
+/* =====================================================
    DOM
-========================================================= */
+===================================================== */
 
 const setupCard =
   document.getElementById("setupCard");
@@ -635,150 +1113,347 @@ const downloadBtn =
 const shareBtn =
   document.getElementById("shareBtn");
 
-const previewBtn =
-  document.getElementById("previewBtn");
+const applyBtn =
+  document.getElementById("applyBtn");
 
-const pdfPreview =
-  document.getElementById("pdfPreview");
+const anotherBtn =
+  document.getElementById("anotherBtn");
+
+const pdfPreviewContainer =
+  document.getElementById(
+    "pdfPreviewContainer"
+  );
+
+const previewCanvasWrap =
+  document.getElementById(
+    "previewCanvasWrap"
+  );
+
+const pdfPreviewCanvas =
+  document.getElementById(
+    "pdfPreviewCanvas"
+  );
+
+const pdfPreviewContext =
+  pdfPreviewCanvas.getContext(
+    "2d"
+  );
+
+const watermarkOverlay =
+  document.getElementById(
+    "watermarkOverlay"
+  );
+
+const footerOverlay =
+  document.getElementById(
+    "footerOverlay"
+  );
+
+const footerNamePreview =
+  document.getElementById(
+    "footerNamePreview"
+  );
+
+const footerPhonePreview =
+  document.getElementById(
+    "footerPhonePreview"
+  );
+
+const previewError =
+  document.getElementById(
+    "previewError"
+  );
+
+const watermarkTab =
+  document.getElementById(
+    "watermarkTab"
+  );
+
+const footerTab =
+  document.getElementById(
+    "footerTab"
+  );
+
+const selectedElementLabel =
+  document.getElementById(
+    "selectedElementLabel"
+  );
+
+const sizeSlider =
+  document.getElementById(
+    "sizeSlider"
+  );
+
+const sizeValue =
+  document.getElementById(
+    "sizeValue"
+  );
+
+const rotationSlider =
+  document.getElementById(
+    "rotationSlider"
+  );
+
+const rotationValue =
+  document.getElementById(
+    "rotationValue"
+  );
+
+const centerToggle =
+  document.getElementById(
+    "centerToggle"
+  );
+
+const watermarkCenterRow =
+  document.getElementById(
+    "watermarkCenterRow"
+  );
 
 const wmTextInput =
   document.getElementById("wmText");
 
 const watermarkFontInput =
-  document.getElementById("watermarkFont");
+  document.getElementById(
+    "watermarkFont"
+  );
 
 const footerNameInput =
-  document.getElementById("footerName");
+  document.getElementById(
+    "footerName"
+  );
 
 const footerPhoneInput =
-  document.getElementById("footerPhone");
+  document.getElementById(
+    "footerPhone"
+  );
 
 const saveSettingsBtn =
-  document.getElementById("saveSettingsBtn");
+  document.getElementById(
+    "saveSettingsBtn"
+  );
 
 const editSettingsBtn =
-  document.getElementById("editSettingsBtn");
+  document.getElementById(
+    "editSettingsBtn"
+  );
 
-const anotherBtn =
-  document.getElementById("anotherBtn");
 
-
-/* =========================================================
+/* =====================================================
    STATE
-========================================================= */
+===================================================== */
 
 let settings = null;
+
 let currentObjectUrl = null;
-let currentFileName = "stamped.pdf";
+
+let currentFileName =
+  "stamped.pdf";
+
+let originalPdfBytes = null;
+
 let isProcessing = false;
 
+let selectedElement =
+  "watermark";
 
-/* =========================================================
-   UI
-========================================================= */
+
+/*
+  Tracks whether there are changes that
+  have not yet been applied.
+*/
+let hasUnappliedChanges = true;
+
+
+/* =====================================================
+   WATERMARK SETTINGS
+===================================================== */
+
+let watermarkSettings = {
+
+  x:0.5,
+  y:0.5,
+
+  scale:1,
+
+  rotation:35,
+
+  centered:false
+
+};
+
+
+/* =====================================================
+   FOOTER SETTINGS
+===================================================== */
+
+let footerSettings = {
+
+  x:0.94,
+  y:0.075,
+
+  scale:1,
+
+  rotation:0
+
+};
+
+
+/* =====================================================
+   BASIC UI
+===================================================== */
 
 function showError(message){
-  errorStatus.textContent = message;
-  errorStatus.classList.remove("hidden");
+
+  errorStatus.textContent =
+    message;
+
+  errorStatus.classList.remove(
+    "hidden"
+  );
 }
+
 
 function clearError(){
-  errorStatus.textContent = "";
-  errorStatus.classList.add("hidden");
+
+  errorStatus.textContent =
+    "";
+
+  errorStatus.classList.add(
+    "hidden"
+  );
 }
+
 
 function showSetup(){
-  setupCard.classList.remove("hidden");
-  summaryCard.classList.add("hidden");
 
-  /*
-    IMPORTANT:
-    While entering/editing details, the upload area stays hidden.
-  */
-  uploadZone.classList.add("hidden");
+  setupCard.classList.remove(
+    "hidden"
+  );
+
+  summaryCard.classList.add(
+    "hidden"
+  );
+
+  uploadZone.classList.add(
+    "hidden"
+  );
+
+  resultCard.classList.add(
+    "hidden"
+  );
 }
+
 
 function showUpload(){
-  setupCard.classList.add("hidden");
-  summaryCard.classList.remove("hidden");
 
-  /*
-    Only after details have been saved do we show the PDF uploader.
-  */
-  uploadZone.classList.remove("hidden");
+  setupCard.classList.add(
+    "hidden"
+  );
+
+  summaryCard.classList.remove(
+    "hidden"
+  );
+
+  uploadZone.classList.remove(
+    "hidden"
+  );
+
+  resultCard.classList.add(
+    "hidden"
+  );
 
   fileInput.disabled = false;
-  uploadZone.classList.remove("disabled");
+
+  uploadZone.classList.remove(
+    "disabled"
+  );
 }
 
+
 function showSavedDetails(){
-  document.getElementById("summaryName").textContent =
+
+  document.getElementById(
+    "summaryName"
+  ).textContent =
     settings.footerName;
 
-  document.getElementById("summaryPhone").textContent =
+  document.getElementById(
+    "summaryPhone"
+  ).textContent =
     settings.footerPhone;
 
   showUpload();
 }
 
 
-/* =========================================================
-   CLEAN RESULT
-========================================================= */
+/* =====================================================
+   MARK EDITOR AS MODIFIED
+===================================================== */
 
-function clearCurrentResult(){
+function markEditorModified(){
 
-  resultCard.classList.add("hidden");
+  hasUnappliedChanges = true;
 
-  if(currentObjectUrl){
-    URL.revokeObjectURL(currentObjectUrl);
-    currentObjectUrl = null;
-  }
+  applyBtn.classList.remove(
+    "hidden"
+  );
 
-  pdfPreview.removeAttribute("src");
+  downloadBtn.classList.add(
+    "hidden"
+  );
 
-  downloadBtn.removeAttribute("href");
-  downloadBtn.removeAttribute("download");
-
-  document.getElementById(
-    "resultFilename"
-  ).textContent = "";
 }
 
 
-/* =========================================================
+/* =====================================================
    SETTINGS
-========================================================= */
+===================================================== */
 
 function getFormSettings(){
 
   return {
-    wmText: wmTextInput.value.trim(),
-    watermarkFont: watermarkFontInput.value,
-    footerName: footerNameInput.value.trim(),
-    footerPhone: footerPhoneInput.value.trim()
+
+    wmText:
+      wmTextInput.value.trim(),
+
+    watermarkFont:
+      watermarkFontInput.value,
+
+    footerName:
+      footerNameInput.value.trim(),
+
+    footerPhone:
+      footerPhoneInput.value.trim()
+
   };
 }
+
 
 function saveSettings(){
 
   const newSettings =
     getFormSettings();
 
+
   if(
     !newSettings.wmText ||
     !newSettings.footerName ||
     !newSettings.footerPhone
   ){
+
     showError(
       "Please fill in all three fields."
     );
+
     return;
   }
 
+
   clearError();
 
-  settings = newSettings;
+  settings =
+    newSettings;
+
 
   try{
 
@@ -796,18 +1471,10 @@ function saveSettings(){
 
   }
 
-  /*
-    After clicking Save:
-    DETAILS DISAPPEAR
-    UPLOAD APPEARS
-  */
+
   showSavedDetails();
 }
 
-
-/* =========================================================
-   LOAD SAVED SETTINGS
-========================================================= */
 
 function loadSettings(){
 
@@ -818,21 +1485,20 @@ function loadSettings(){
         "watermark-settings"
       );
 
+
     if(!saved){
 
       settings = null;
 
-      /*
-        FIRST PAGE:
-        Only Your Details.
-      */
       showSetup();
 
       return;
     }
 
+
     const parsed =
       JSON.parse(saved);
+
 
     if(
       !parsed ||
@@ -847,23 +1513,31 @@ function loadSettings(){
       );
 
       settings = null;
+
       showSetup();
 
       return;
     }
 
+
     settings = {
-      wmText: String(parsed.wmText),
+
+      wmText:
+        String(parsed.wmText),
+
       watermarkFont:
         parsed.watermarkFont ||
         "TimesRomanItalic",
-      footerName: String(parsed.footerName),
-      footerPhone: String(parsed.footerPhone)
+
+      footerName:
+        String(parsed.footerName),
+
+      footerPhone:
+        String(parsed.footerPhone)
+
     };
 
-    /*
-      Populate edit form.
-    */
+
     wmTextInput.value =
       settings.wmText;
 
@@ -876,11 +1550,9 @@ function loadSettings(){
     footerPhoneInput.value =
       settings.footerPhone;
 
-    /*
-      Returning user:
-      Saved details + upload.
-    */
+
     showSavedDetails();
+
 
   }catch(error){
 
@@ -890,14 +1562,16 @@ function loadSettings(){
     );
 
     settings = null;
+
     showSetup();
+
   }
 }
 
 
-/* =========================================================
-   EDIT SETTINGS
-========================================================= */
+/* =====================================================
+   EDIT DETAILS
+===================================================== */
 
 editSettingsBtn.addEventListener(
   "click",
@@ -905,22 +1579,15 @@ editSettingsBtn.addEventListener(
 
     clearError();
 
-    /*
-      Hide upload while editing.
-    */
     showSetup();
 
-    /*
-      Existing settings remain in the form.
-      User can change them and save.
-    */
   }
 );
 
 
-/* =========================================================
-   OPEN FILE PICKER
-========================================================= */
+/* =====================================================
+   FILE PICKER
+===================================================== */
 
 function openFilePicker(){
 
@@ -928,18 +1595,24 @@ function openFilePicker(){
     fileInput.disabled ||
     isProcessing
   ){
+
     return;
+
   }
+
 
   clearError();
 
   fileInput.click();
+
 }
+
 
 uploadZone.addEventListener(
   "click",
   openFilePicker
 );
+
 
 uploadZone.addEventListener(
   "keydown",
@@ -953,15 +1626,16 @@ uploadZone.addEventListener(
       event.preventDefault();
 
       openFilePicker();
+
     }
 
   }
 );
 
 
-/* =========================================================
-   DRAG + DROP
-========================================================= */
+/* =====================================================
+   DRAG & DROP
+===================================================== */
 
 ["dragenter","dragover"]
 .forEach(eventName => {
@@ -974,10 +1648,14 @@ uploadZone.addEventListener(
         fileInput.disabled ||
         isProcessing
       ){
+
         return;
+
       }
 
+
       event.preventDefault();
+
       event.stopPropagation();
 
       uploadZone.classList.add(
@@ -989,6 +1667,7 @@ uploadZone.addEventListener(
 
 });
 
+
 ["dragleave","dragend"]
 .forEach(eventName => {
 
@@ -997,6 +1676,7 @@ uploadZone.addEventListener(
     event => {
 
       event.preventDefault();
+
       event.stopPropagation();
 
       uploadZone.classList.remove(
@@ -1008,40 +1688,49 @@ uploadZone.addEventListener(
 
 });
 
+
 uploadZone.addEventListener(
   "drop",
   event => {
 
     event.preventDefault();
+
     event.stopPropagation();
 
     uploadZone.classList.remove(
       "dragover"
     );
 
+
     if(
       fileInput.disabled ||
       isProcessing
     ){
+
       return;
+
     }
+
 
     const file =
       event.dataTransfer &&
       event.dataTransfer.files &&
       event.dataTransfer.files[0];
 
+
     if(file){
+
       handleFile(file);
+
     }
 
   }
 );
 
 
-/* =========================================================
-   FILE SELECTION
-========================================================= */
+/* =====================================================
+   FILE INPUT
+===================================================== */
 
 fileInput.addEventListener(
   "change",
@@ -1051,70 +1740,75 @@ fileInput.addEventListener(
       event.target.files &&
       event.target.files[0];
 
-    /*
-      Reset input so the same PDF can be
-      selected again later.
-    */
+
     fileInput.value = "";
 
+
     if(file){
+
       handleFile(file);
+
     }
 
   }
 );
 
 
-/* =========================================================
-   VALIDATE PDF
-========================================================= */
+/* =====================================================
+   PDF VALIDATION
+===================================================== */
 
 function isPdfFile(file){
 
   if(!file){
+
     return false;
+
   }
 
-  const name =
+
+  const filename =
     typeof file.name === "string"
       ? file.name.toLowerCase()
       : "";
 
-  return (
-    name.endsWith(".pdf") &&
-    (
-      file.type === "" ||
-      file.type === "application/pdf"
-    )
+
+  return filename.endsWith(
+    ".pdf"
   );
+
 }
 
 
-/* =========================================================
-   HANDLE PDF
-========================================================= */
+/* =====================================================
+   HANDLE FILE
+===================================================== */
 
 async function handleFile(file){
 
-  if(!file || isProcessing){
+  if(
+    !file ||
+    isProcessing
+  ){
+
     return;
+
   }
+
 
   if(!isPdfFile(file)){
 
     showError(
-      "That doesn't look like a PDF. Please choose a PDF file."
+      "Please choose a PDF file."
     );
 
     return;
+
   }
+
 
   if(!settings){
 
-    /*
-      This should never normally happen because
-      the upload area is hidden until settings exist.
-    */
     showError(
       "Please save your details first."
     );
@@ -1122,79 +1816,125 @@ async function handleFile(file){
     showSetup();
 
     return;
+
   }
 
-  /*
-    IMMEDIATELY HIDE THE UPLOAD AREA
-    AFTER A PDF HAS BEEN CHOSEN.
-  */
-  uploadZone.classList.add("hidden");
+
+  uploadZone.classList.add(
+    "hidden"
+  );
+
 
   await processPdf(file);
+
 }
 
 
-/* =========================================================
+/* =====================================================
    PROCESS PDF
-========================================================= */
+===================================================== */
 
 async function processPdf(file){
 
   if(!PDFLibReady){
 
+    uploadZone.classList.remove(
+      "hidden"
+    );
+
     showError(
       "The PDF engine did not load. Please refresh the page and try again."
     );
 
-    uploadZone.classList.remove("hidden");
+    return;
+
+  }
+
+
+  if(!PDFJSReady){
+
+    uploadZone.classList.remove(
+      "hidden"
+    );
+
+    showError(
+      "The PDF preview engine did not load. Please refresh the page and try again."
+    );
 
     return;
+
   }
+
 
   isProcessing = true;
 
   clearError();
-  clearCurrentResult();
 
-  workingCard.classList.remove("hidden");
 
-  workingStatus.textContent =
-    "Reading your PDF…";
+  resultCard.classList.add(
+    "hidden"
+  );
+
+
+  workingCard.classList.remove(
+    "hidden"
+  );
+
 
   fileInput.disabled = true;
+
 
   try{
 
     await new Promise(
-      resolve => requestAnimationFrame(resolve)
+      resolve =>
+        requestAnimationFrame(
+          resolve
+        )
     );
 
+
     workingStatus.textContent =
-      "Stamping your PDF…";
+      "Reading your PDF…";
+
 
     const bytes =
       await file.arrayBuffer();
 
-    const stampedBytes =
-      await stampPdf(
-        bytes,
-        settings
-      );
 
-    const blob =
-      new Blob(
-        [stampedBytes],
-        {type:"application/pdf"}
-      );
+    originalPdfBytes =
+      new Uint8Array(bytes);
 
-    if(currentObjectUrl){
-      URL.revokeObjectURL(
-        currentObjectUrl
-      );
-    }
 
-    currentObjectUrl =
-      URL.createObjectURL(blob);
+    watermarkSettings = {
+
+      x:0.5,
+      y:0.5,
+
+      scale:1,
+
+      rotation:35,
+
+      centered:false
+
+    };
+
+
+    footerSettings = {
+
+      x:0.94,
+      y:0.075,
+
+      scale:1,
+
+      rotation:0
+
+    };
+
+
+    selectedElement =
+      "watermark";
+
 
     currentFileName =
       file.name.replace(
@@ -1203,86 +1943,1065 @@ async function processPdf(file){
       ) +
       " - stamped.pdf";
 
-    downloadBtn.href =
-      currentObjectUrl;
 
-    downloadBtn.download =
-      currentFileName;
+    hasUnappliedChanges = true;
 
-    document.getElementById(
-      "resultFilename"
-    ).textContent =
-      currentFileName;
 
-    pdfPreview.src =
-      currentObjectUrl;
+    updateEditorUI();
 
-    workingCard.classList.add("hidden");
 
-    resultCard.classList.remove(
-      "hidden"
+    workingStatus.textContent =
+      "Preparing preview…";
+
+
+    await renderInteractivePreview(
+      originalPdfBytes
     );
 
-  }catch(error){
-
-    console.error(
-      "PDF stamping error:",
-      error
-    );
 
     workingCard.classList.add(
       "hidden"
     );
 
-    /*
-      If processing fails, allow the user
-      to choose another PDF.
-    */
+
+    resultCard.classList.remove(
+      "hidden"
+    );
+
+
+    applyBtn.classList.remove(
+      "hidden"
+    );
+
+
+    downloadBtn.classList.add(
+      "hidden"
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "PDF preview error:",
+      error
+    );
+
+
+    workingCard.classList.add(
+      "hidden"
+    );
+
+
     uploadZone.classList.remove(
       "hidden"
     );
 
+
     showError(
       getPdfErrorMessage(error)
     );
+
 
   }finally{
 
     isProcessing = false;
 
     fileInput.disabled = false;
-  }
-}
 
-function getPdfErrorMessage(error){
-
-  const message =
-    error &&
-    typeof error.message === "string"
-      ? error.message.toLowerCase()
-      : "";
-
-  if(
-    message.includes("password") ||
-    message.includes("encrypted")
-  ){
-    return "This PDF is password-protected or encrypted. Please use an unlocked PDF.";
   }
 
-  if(
-    message.includes("invalid") ||
-    message.includes("parse")
-  ){
-    return "This PDF appears to be damaged or unsupported. Please try another PDF.";
-  }
-
-  return "Couldn't stamp that PDF. Please make sure it is a valid PDF and try again.";
 }
 
 
-/* =========================================================
+/* =====================================================
+   ELEMENT SELECTION
+===================================================== */
+
+function getSelectedSettings(){
+
+  return selectedElement === "watermark"
+    ? watermarkSettings
+    : footerSettings;
+
+}
+
+
+function selectElement(element){
+
+  selectedElement =
+    element;
+
+
+  /*
+    Switching tabs is NOT a modification.
+  */
+  updateEditorUI();
+
+}
+
+
+watermarkTab.addEventListener(
+  "click",
+  () => {
+
+    selectElement(
+      "watermark"
+    );
+
+  }
+);
+
+
+footerTab.addEventListener(
+  "click",
+  () => {
+
+    selectElement(
+      "footer"
+    );
+
+  }
+);
+
+
+/* =====================================================
+   EDITOR UI
+===================================================== */
+
+function updateEditorUI(){
+
+  const current =
+    getSelectedSettings();
+
+
+  watermarkTab.classList.toggle(
+    "active",
+    selectedElement === "watermark"
+  );
+
+
+  footerTab.classList.toggle(
+    "active",
+    selectedElement === "footer"
+  );
+
+
+  selectedElementLabel.textContent =
+    selectedElement === "watermark"
+      ? "Editing: Watermark"
+      : "Editing: Footer";
+
+
+  sizeSlider.value =
+    Math.round(
+      current.scale * 100
+    );
+
+
+  sizeValue.textContent =
+    `${Math.round(current.scale * 100)}%`;
+
+
+  rotationSlider.value =
+    current.rotation;
+
+
+  rotationValue.textContent =
+    `${current.rotation}°`;
+
+
+  /*
+    Keep centered only exists for
+    the watermark.
+  */
+  watermarkCenterRow.classList.toggle(
+    "hidden",
+    selectedElement !== "watermark"
+  );
+
+
+  centerToggle.checked =
+    selectedElement === "watermark"
+      ? watermarkSettings.centered
+      : false;
+
+
+  updateOverlayAppearance();
+
+  updateWatermarkOverlay();
+
+  updateFooterOverlay();
+
+}
+
+
+/* =====================================================
+   FONT
+===================================================== */
+
+function getWatermarkFontFamily(){
+
+  const font =
+    settings &&
+    settings.watermarkFont
+      ? settings.watermarkFont
+      : "TimesRomanItalic";
+
+
+  if(
+    font === "Helvetica" ||
+    font === "HelveticaOblique"
+  ){
+
+    return "Arial, Helvetica, sans-serif";
+
+  }
+
+
+  if(
+    font === "Courier" ||
+    font === "CourierOblique"
+  ){
+
+    return "\"Courier New\", Courier, monospace";
+
+  }
+
+
+  return "Georgia, \"Times New Roman\", serif";
+
+}
+
+
+function isItalicFont(){
+
+  if(!settings){
+
+    return true;
+
+  }
+
+
+  return (
+    settings.watermarkFont ===
+      "TimesRomanItalic" ||
+
+    settings.watermarkFont ===
+      "HelveticaOblique" ||
+
+    settings.watermarkFont ===
+      "CourierOblique"
+  );
+
+}
+
+
+/* =====================================================
+   OVERLAY APPEARANCE
+===================================================== */
+
+function updateOverlayAppearance(){
+
+  watermarkOverlay.classList.toggle(
+    "selected",
+    selectedElement === "watermark"
+  );
+
+
+  footerOverlay.classList.toggle(
+    "selected",
+    selectedElement === "footer"
+  );
+
+
+  watermarkOverlay.classList.toggle(
+    "locked",
+    watermarkSettings.centered
+  );
+
+}
+
+
+/* =====================================================
+   WATERMARK PREVIEW
+===================================================== */
+
+function updateWatermarkOverlay(){
+
+  if(
+    !settings ||
+    !previewCanvasWrap.clientWidth ||
+    !previewCanvasWrap.clientHeight
+  ){
+
+    return;
+
+  }
+
+
+  const width =
+    previewCanvasWrap.clientWidth;
+
+  const height =
+    previewCanvasWrap.clientHeight;
+
+
+  /*
+    Keep centered = exact preview center.
+  */
+  if(
+    watermarkSettings.centered
+  ){
+
+    watermarkSettings.x =
+      0.5;
+
+    watermarkSettings.y =
+      0.5;
+
+  }
+
+
+  const shortestSide =
+    Math.min(
+      width,
+      height
+    );
+
+
+  const fontSize =
+    shortestSide *
+    0.16 *
+    watermarkSettings.scale;
+
+
+  watermarkOverlay.textContent =
+    settings.wmText;
+
+
+  watermarkOverlay.style.fontFamily =
+    getWatermarkFontFamily();
+
+
+  watermarkOverlay.style.fontStyle =
+    isItalicFont()
+      ? "italic"
+      : "normal";
+
+
+  watermarkOverlay.style.fontSize =
+    `${fontSize}px`;
+
+
+  watermarkOverlay.style.fontWeight =
+    "400";
+
+
+  watermarkOverlay.style.left =
+    `${watermarkSettings.x * width}px`;
+
+
+  watermarkOverlay.style.top =
+    `${(1 - watermarkSettings.y) * height}px`;
+
+
+  watermarkOverlay.style.transformOrigin =
+    "center center";
+
+
+  watermarkOverlay.style.transform =
+    `translate(-50%, -50%) rotate(${watermarkSettings.rotation}deg)`;
+
+
+  watermarkOverlay.style.display =
+    "block";
+
+}
+
+
+/* =====================================================
+   FOOTER PREVIEW
+===================================================== */
+
+function updateFooterOverlay(){
+
+  if(
+    !settings ||
+    !previewCanvasWrap.clientWidth ||
+    !previewCanvasWrap.clientHeight
+  ){
+
+    return;
+
+  }
+
+
+  const width =
+    previewCanvasWrap.clientWidth;
+
+  const height =
+    previewCanvasWrap.clientHeight;
+
+
+  const shortestSide =
+    Math.min(
+      width,
+      height
+    );
+
+
+  const nameSize =
+    Math.max(
+      8,
+      shortestSide *
+      0.028 *
+      footerSettings.scale
+    );
+
+
+  const phoneSize =
+    Math.max(
+      7,
+      nameSize *
+      0.82
+    );
+
+
+  footerNamePreview.textContent =
+    settings.footerName;
+
+
+  footerPhonePreview.textContent =
+    settings.footerPhone;
+
+
+  footerNamePreview.style.fontSize =
+    `${nameSize}px`;
+
+
+  footerPhonePreview.style.fontSize =
+    `${phoneSize}px`;
+
+
+  footerOverlay.style.left =
+    `${footerSettings.x * width}px`;
+
+
+  footerOverlay.style.top =
+    `${(1 - footerSettings.y) * height}px`;
+
+
+  footerOverlay.style.transformOrigin =
+    "center center";
+
+
+  footerOverlay.style.transform =
+    `translate(-50%, -50%) rotate(${footerSettings.rotation}deg)`;
+
+
+  footerOverlay.style.display =
+    "block";
+
+}
+
+
+/* =====================================================
+   SIZE SLIDER
+===================================================== */
+
+sizeSlider.addEventListener(
+  "input",
+  () => {
+
+    const current =
+      getSelectedSettings();
+
+
+    current.scale =
+      Number(
+        sizeSlider.value
+      ) / 100;
+
+
+    sizeValue.textContent =
+      `${Math.round(current.scale * 100)}%`;
+
+
+    if(
+      selectedElement === "watermark"
+    ){
+
+      updateWatermarkOverlay();
+
+    }else{
+
+      updateFooterOverlay();
+
+    }
+
+
+    markEditorModified();
+
+  }
+);
+
+
+/* =====================================================
+   ROTATION SLIDER
+===================================================== */
+
+rotationSlider.addEventListener(
+  "input",
+  () => {
+
+    const current =
+      getSelectedSettings();
+
+
+    current.rotation =
+      Number(
+        rotationSlider.value
+      );
+
+
+    rotationValue.textContent =
+      `${current.rotation}°`;
+
+
+    if(
+      selectedElement === "watermark"
+    ){
+
+      updateWatermarkOverlay();
+
+    }else{
+
+      updateFooterOverlay();
+
+    }
+
+
+    markEditorModified();
+
+  }
+);
+
+
+/* =====================================================
+   WATERMARK CENTER
+===================================================== */
+
+centerToggle.addEventListener(
+  "change",
+  () => {
+
+    if(
+      selectedElement !== "watermark"
+    ){
+
+      return;
+
+    }
+
+
+    watermarkSettings.centered =
+      centerToggle.checked;
+
+
+    if(
+      watermarkSettings.centered
+    ){
+
+      watermarkSettings.x =
+        0.5;
+
+      watermarkSettings.y =
+        0.5;
+
+    }
+
+
+    updateEditorUI();
+
+    markEditorModified();
+
+  }
+);
+
+
+/* =====================================================
+   DRAGGING
+===================================================== */
+
+let draggingElement = null;
+
+let activePointerId = null;
+
+
+function startElementDrag(
+  elementName,
+  event
+){
+
+  if(
+    selectedElement !== elementName
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    elementName === "watermark" &&
+    watermarkSettings.centered
+  ){
+
+    return;
+
+  }
+
+
+  event.preventDefault();
+
+  event.stopPropagation();
+
+
+  draggingElement =
+    elementName;
+
+
+  activePointerId =
+    event.pointerId;
+
+
+  const overlay =
+    elementName === "watermark"
+      ? watermarkOverlay
+      : footerOverlay;
+
+
+  overlay.classList.add(
+    "dragging"
+  );
+
+
+  try{
+
+    overlay.setPointerCapture(
+      event.pointerId
+    );
+
+  }catch(error){
+
+    console.warn(
+      "Pointer capture unavailable:",
+      error
+    );
+
+  }
+
+
+  updateElementPosition(
+    elementName,
+    event
+  );
+
+}
+
+
+function moveElementDrag(event){
+
+  if(
+    !draggingElement ||
+    event.pointerId !== activePointerId
+  ){
+
+    return;
+
+  }
+
+
+  event.preventDefault();
+
+
+  updateElementPosition(
+    draggingElement,
+    event
+  );
+
+}
+
+
+function stopElementDrag(event){
+
+  if(
+    activePointerId !== null &&
+    event.pointerId !== activePointerId
+  ){
+
+    return;
+
+  }
+
+
+  const overlay =
+    draggingElement === "watermark"
+      ? watermarkOverlay
+      : footerOverlay;
+
+
+  if(overlay){
+
+    overlay.classList.remove(
+      "dragging"
+    );
+
+
+    try{
+
+      overlay.releasePointerCapture(
+        event.pointerId
+      );
+
+    }catch(error){
+
+      /* Safe to ignore */
+
+    }
+
+  }
+
+
+  draggingElement = null;
+
+  activePointerId = null;
+
+}
+
+
+watermarkOverlay.addEventListener(
+  "pointerdown",
+  event =>
+    startElementDrag(
+      "watermark",
+      event
+    )
+);
+
+
+footerOverlay.addEventListener(
+  "pointerdown",
+  event =>
+    startElementDrag(
+      "footer",
+      event
+    )
+);
+
+
+watermarkOverlay.addEventListener(
+  "pointermove",
+  moveElementDrag
+);
+
+
+footerOverlay.addEventListener(
+  "pointermove",
+  moveElementDrag
+);
+
+
+watermarkOverlay.addEventListener(
+  "pointerup",
+  stopElementDrag
+);
+
+
+footerOverlay.addEventListener(
+  "pointerup",
+  stopElementDrag
+);
+
+
+watermarkOverlay.addEventListener(
+  "pointercancel",
+  stopElementDrag
+);
+
+
+footerOverlay.addEventListener(
+  "pointercancel",
+  stopElementDrag
+);
+
+
+/* =====================================================
+   UPDATE POSITION
+===================================================== */
+
+function updateElementPosition(
+  elementName,
+  event
+){
+
+  const current =
+    elementName === "watermark"
+      ? watermarkSettings
+      : footerSettings;
+
+
+  if(
+    elementName === "watermark" &&
+    current.centered
+  ){
+
+    return;
+
+  }
+
+
+  const rect =
+    previewCanvasWrap.getBoundingClientRect();
+
+
+  if(
+    !rect.width ||
+    !rect.height
+  ){
+
+    return;
+
+  }
+
+
+  let x =
+    (event.clientX - rect.left) /
+    rect.width;
+
+
+  let y =
+    (event.clientY - rect.top) /
+    rect.height;
+
+
+  x =
+    Math.max(
+      0,
+      Math.min(
+        1,
+        x
+      )
+    );
+
+
+  y =
+    Math.max(
+      0,
+      Math.min(
+        1,
+        y
+      )
+    );
+
+
+  current.x =
+    x;
+
+
+  current.y =
+    1 - y;
+
+
+  if(
+    elementName === "watermark"
+  ){
+
+    updateWatermarkOverlay();
+
+  }else{
+
+    updateFooterOverlay();
+
+  }
+
+
+  /*
+    Dragging = modification.
+  */
+  markEditorModified();
+
+}
+
+
+/* =====================================================
+   PDF.JS PREVIEW
+===================================================== */
+
+async function renderInteractivePreview(
+  pdfBytes
+){
+
+  const data =
+    new Uint8Array(
+      pdfBytes
+    );
+
+
+  const loadingTask =
+    pdfjsLib.getDocument({
+      data:data
+    });
+
+
+  const previewPdf =
+    await loadingTask.promise;
+
+
+  const page =
+    await previewPdf.getPage(
+      1
+    );
+
+
+  window.previewPage =
+    page;
+
+
+  await drawPreviewPage();
+
+
+  try{
+
+    await previewPdf.destroy();
+
+  }catch(error){
+
+    console.warn(
+      "Preview cleanup warning:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   DRAW PREVIEW PAGE
+===================================================== */
+
+async function drawPreviewPage(){
+
+  const page =
+    window.previewPage;
+
+
+  if(!page){
+
+    return;
+
+  }
+
+
+  const baseViewport =
+    page.getViewport({
+      scale:1
+    });
+
+
+  const availableWidth =
+    Math.max(
+      pdfPreviewContainer.clientWidth - 20,
+      100
+    );
+
+
+  const scale =
+    availableWidth /
+    baseViewport.width;
+
+
+  const viewport =
+    page.getViewport({
+      scale:Math.max(
+        scale,
+        0.5
+      )
+    });
+
+
+  const deviceScale =
+    Math.min(
+      window.devicePixelRatio || 1,
+      2
+    );
+
+
+  pdfPreviewCanvas.width =
+    Math.ceil(
+      viewport.width *
+      deviceScale
+    );
+
+
+  pdfPreviewCanvas.height =
+    Math.ceil(
+      viewport.height *
+      deviceScale
+    );
+
+
+  pdfPreviewCanvas.style.width =
+    `${viewport.width}px`;
+
+
+  pdfPreviewCanvas.style.height =
+    `${viewport.height}px`;
+
+
+  previewCanvasWrap.style.width =
+    `${viewport.width}px`;
+
+
+  pdfPreviewContext.setTransform(
+    deviceScale,
+    0,
+    0,
+    deviceScale,
+    0,
+    0
+  );
+
+
+  pdfPreviewContext.clearRect(
+    0,
+    0,
+    viewport.width,
+    viewport.height
+  );
+
+
+  await page.render({
+
+    canvasContext:
+      pdfPreviewContext,
+
+    viewport:viewport
+
+  }).promise;
+
+
+  updateWatermarkOverlay();
+
+  updateFooterOverlay();
+
+}
+
+
+/* =====================================================
    WATERMARK FONT
-========================================================= */
+===================================================== */
 
 function getWatermarkFont(fontKey){
 
@@ -1305,18 +3024,21 @@ function getWatermarkFont(fontKey){
 
     Courier:
       StandardFonts.Courier
+
   };
+
 
   return (
     fontMap[fontKey] ||
     StandardFonts.TimesRomanItalic
   );
+
 }
 
 
-/* =========================================================
-   STAMP PDF
-========================================================= */
+/* =====================================================
+   FINAL PDF
+===================================================== */
 
 async function stampPdf(
   arrayBuffer,
@@ -1328,6 +3050,7 @@ async function stampPdf(
       arrayBuffer
     );
 
+
   const watermarkFont =
     await pdfDoc.embedFont(
       getWatermarkFont(
@@ -1335,20 +3058,22 @@ async function stampPdf(
       )
     );
 
+
   const boldFont =
     await pdfDoc.embedFont(
       StandardFonts.HelveticaBold
     );
+
 
   const regFont =
     await pdfDoc.embedFont(
       StandardFonts.Helvetica
     );
 
+
   const pages =
     pdfDoc.getPages();
 
-  const angle = 35;
 
   for(const page of pages){
 
@@ -1357,151 +3082,924 @@ async function stampPdf(
       height
     } = page.getSize();
 
+
     const shortestSide =
       Math.min(
         width,
         height
       );
 
-    const wmFontSize =
+
+    /* =================================================
+       WATERMARK
+    ================================================== */
+
+    const watermarkFontSize =
       Math.min(
-        shortestSide * 0.16,
-        110
+        shortestSide *
+        0.16 *
+        watermarkSettings.scale,
+
+        150
       );
 
-    const wmTextWidth =
+
+    const watermarkTextWidth =
       watermarkFont.widthOfTextAtSize(
         s.wmText,
-        wmFontSize
+        watermarkFontSize
       );
 
-    /*
-      Center the watermark more accurately.
-    */
-    const wmX =
-      (width - wmTextWidth) / 2;
 
-    const wmY =
-      height / 2 -
-      wmFontSize / 3;
+    let watermarkCenterX =
+      watermarkSettings.x *
+      width;
+
+
+    let watermarkCenterY =
+      watermarkSettings.y *
+      height;
+
+
+    if(
+      watermarkSettings.centered
+    ){
+
+      watermarkCenterX =
+        width / 2;
+
+      watermarkCenterY =
+        height / 2;
+
+    }
+
+
+    /*
+      Correctly account for rotation when
+      positioning the watermark.
+    */
+    const angle =
+      watermarkSettings.rotation *
+      Math.PI /
+      180;
+
+
+    const cos =
+      Math.cos(angle);
+
+
+    const sin =
+      Math.sin(angle);
+
+
+    const textHeight =
+      watermarkFontSize;
+
+
+    const corners = [
+
+      {x:0,y:0},
+
+      {
+        x:watermarkTextWidth,
+        y:0
+      },
+
+      {
+        x:0,
+        y:textHeight
+      },
+
+      {
+        x:watermarkTextWidth,
+        y:textHeight
+      }
+
+    ];
+
+
+    const rotatedCorners =
+      corners.map(point => ({
+
+        x:
+          point.x * cos -
+          point.y * sin,
+
+        y:
+          point.x * sin +
+          point.y * cos
+
+      }));
+
+
+    const minX =
+      Math.min(
+        ...rotatedCorners.map(
+          p => p.x
+        )
+      );
+
+
+    const maxX =
+      Math.max(
+        ...rotatedCorners.map(
+          p => p.x
+        )
+      );
+
+
+    const minY =
+      Math.min(
+        ...rotatedCorners.map(
+          p => p.y
+        )
+      );
+
+
+    const maxY =
+      Math.max(
+        ...rotatedCorners.map(
+          p => p.y
+        )
+      );
+
+
+    const rotatedCenterX =
+      (minX + maxX) / 2;
+
+
+    const rotatedCenterY =
+      (minY + maxY) / 2;
+
+
+    const watermarkX =
+      watermarkCenterX -
+      rotatedCenterX;
+
+
+    const watermarkY =
+      watermarkCenterY -
+      rotatedCenterY;
+
 
     page.drawText(
       s.wmText,
       {
-        x:wmX,
-        y:wmY,
-        size:wmFontSize,
-        font:watermarkFont,
-        color:rgb(
-          0.55,
-          0.55,
-          0.55
-        ),
-        opacity:0.32,
-        rotate:degrees(angle)
+
+        x:
+          watermarkX,
+
+        y:
+          watermarkY,
+
+        size:
+          watermarkFontSize,
+
+        font:
+          watermarkFont,
+
+        color:
+          rgb(
+            0.55,
+            0.55,
+            0.55
+          ),
+
+        opacity:
+          0.32,
+
+        rotate:
+          degrees(
+            watermarkSettings.rotation
+          )
+
       }
     );
 
 
-    /* Footer */
+    /* =================================================
+       FOOTER
+    ================================================== */
 
-    const margin =
-      shortestSide * 0.045;
-
-    const nameFontSize =
+    const footerNameFontSize =
       Math.max(
         8,
         Math.min(
-          shortestSide * 0.028,
-          22
+          shortestSide *
+          0.028 *
+          footerSettings.scale,
+
+          50
         )
       );
 
-    const phoneFontSize =
+
+    const footerPhoneFontSize =
       Math.max(
         7,
-        nameFontSize * 0.82
+        footerNameFontSize *
+        0.82
       );
 
-    const nameWidth =
+
+    const footerNameWidth =
       boldFont.widthOfTextAtSize(
         s.footerName,
-        nameFontSize
+        footerNameFontSize
       );
 
-    const phoneWidth =
+
+    const footerPhoneWidth =
       regFont.widthOfTextAtSize(
         s.footerPhone,
-        phoneFontSize
+        footerPhoneFontSize
       );
 
-    const phoneY =
-      margin;
 
-    const nameY =
-      margin +
-      phoneFontSize +
-      nameFontSize * 0.35;
+    const footerGroupWidth =
+      Math.max(
+        footerNameWidth,
+        footerPhoneWidth
+      );
 
-    page.drawText(
-      s.footerName,
-      {
-        x:Math.max(
-          margin,
-          width -
-          margin -
-          nameWidth
-        ),
-        y:nameY,
-        size:nameFontSize,
-        font:boldFont,
-        color:rgb(
-          0.1,
-          0.1,
-          0.1
-        )
-      }
-    );
 
-    page.drawText(
-      s.footerPhone,
-      {
-        x:Math.max(
-          margin,
-          width -
-          margin -
-          phoneWidth
-        ),
-        y:phoneY,
-        size:phoneFontSize,
-        font:regFont,
-        color:rgb(
-          0.1,
-          0.1,
-          0.1
-        )
-      }
-    );
+    const footerGroupHeight =
+      footerNameFontSize +
+      footerPhoneFontSize *
+      1.35;
+
+
+    const footerCenterX =
+      footerSettings.x *
+      width;
+
+
+    const footerCenterY =
+      footerSettings.y *
+      height;
+
+
+    const footerLeft =
+      footerCenterX -
+      footerGroupWidth / 2;
+
+
+    const footerBottom =
+      footerCenterY -
+      footerGroupHeight / 2;
+
+
+    /*
+      FOOTER ROTATION = 0
+    */
+    if(
+      footerSettings.rotation === 0
+    ){
+
+      page.drawText(
+        s.footerName,
+        {
+
+          x:
+            footerLeft +
+            footerGroupWidth -
+            footerNameWidth,
+
+          y:
+            footerBottom +
+            footerPhoneFontSize *
+            0.95,
+
+          size:
+            footerNameFontSize,
+
+          font:
+            boldFont,
+
+          color:
+            rgb(
+              0.1,
+              0.1,
+              0.1
+            )
+
+        }
+      );
+
+
+      page.drawText(
+        s.footerPhone,
+        {
+
+          x:
+            footerLeft +
+            footerGroupWidth -
+            footerPhoneWidth,
+
+          y:
+            footerBottom,
+
+          size:
+            footerPhoneFontSize,
+
+          font:
+            regFont,
+
+          color:
+            rgb(
+              0.1,
+              0.1,
+              0.1
+            )
+
+        }
+      );
+
+
+    }else{
+
+      const footerAngle =
+        footerSettings.rotation *
+        Math.PI /
+        180;
+
+
+      const rotatePoint = (
+        localX,
+        localY
+      ) => {
+
+        return {
+
+          x:
+            footerCenterX +
+            localX *
+            Math.cos(footerAngle) -
+            localY *
+            Math.sin(footerAngle),
+
+          y:
+            footerCenterY +
+            localX *
+            Math.sin(footerAngle) +
+            localY *
+            Math.cos(footerAngle)
+
+        };
+
+      };
+
+
+      const namePoint =
+        rotatePoint(
+          -footerGroupWidth / 2,
+          footerNameFontSize * 0.05
+        );
+
+
+      const phonePoint =
+        rotatePoint(
+          -footerGroupWidth / 2,
+          -footerPhoneFontSize * 0.95
+        );
+
+
+      page.drawText(
+        s.footerName,
+        {
+
+          x:
+            namePoint.x,
+
+          y:
+            namePoint.y,
+
+          size:
+            footerNameFontSize,
+
+          font:
+            boldFont,
+
+          color:
+            rgb(
+              0.1,
+              0.1,
+              0.1
+            ),
+
+          rotate:
+            degrees(
+              footerSettings.rotation
+            )
+
+        }
+      );
+
+
+      page.drawText(
+        s.footerPhone,
+        {
+
+          x:
+            phonePoint.x,
+
+          y:
+            phonePoint.y,
+
+          size:
+            footerPhoneFontSize,
+
+          font:
+            regFont,
+
+          color:
+            rgb(
+              0.1,
+              0.1,
+              0.1
+            ),
+
+          rotate:
+            degrees(
+              footerSettings.rotation
+            )
+
+        }
+      );
+
+    }
 
   }
 
-  return pdfDoc.save();
+
+  return await pdfDoc.save();
+
 }
 
 
-/* =========================================================
-   SAVE SETTINGS
-========================================================= */
+/* =====================================================
+   APPLY CHANGES
+===================================================== */
 
-saveSettingsBtn.addEventListener(
+applyBtn.addEventListener(
   "click",
-  saveSettings
+  async () => {
+
+    if(
+      !originalPdfBytes ||
+      !settings ||
+      isProcessing
+    ){
+
+      return;
+
+    }
+
+
+    clearError();
+
+    isProcessing = true;
+
+
+    applyBtn.disabled = true;
+
+    applyBtn.textContent =
+      "Applying…";
+
+
+    try{
+
+      if(
+        watermarkSettings.centered
+      ){
+
+        watermarkSettings.x =
+          0.5;
+
+        watermarkSettings.y =
+          0.5;
+
+      }
+
+
+      const stampedBytes =
+        await stampPdf(
+          originalPdfBytes,
+          settings
+        );
+
+
+      const blob =
+        new Blob(
+          [stampedBytes],
+          {
+            type:"application/pdf"
+          }
+        );
+
+
+      if(currentObjectUrl){
+
+        URL.revokeObjectURL(
+          currentObjectUrl
+        );
+
+      }
+
+
+      currentObjectUrl =
+        URL.createObjectURL(blob);
+
+
+      downloadBtn.href =
+        currentObjectUrl;
+
+
+      downloadBtn.download =
+        currentFileName;
+
+
+      downloadBtn.classList.remove(
+        "hidden"
+      );
+
+
+      /*
+        The PDF is now synchronized
+        with the editor.
+      */
+      hasUnappliedChanges = false;
+
+
+      /*
+        Hide Apply Changes after success.
+      */
+      applyBtn.classList.add(
+        "hidden"
+      );
+
+
+      applyBtn.disabled = false;
+
+      applyBtn.textContent =
+        "Apply Changes";
+
+
+    }catch(error){
+
+      console.error(
+        "PDF stamping error:",
+        error
+      );
+
+
+      applyBtn.disabled = false;
+
+      applyBtn.textContent =
+        "Apply Changes";
+
+
+      showError(
+        getPdfErrorMessage(error)
+      );
+
+
+    }finally{
+
+      isProcessing = false;
+
+    }
+
+  }
 );
 
 
-/* =========================================================
+/* =====================================================
+   ERROR MESSAGE
+===================================================== */
+
+function getPdfErrorMessage(error){
+
+  if(!error){
+
+    return "Couldn't process that PDF. Please try another PDF.";
+
+  }
+
+
+  const message =
+    typeof error.message === "string"
+      ? error.message.toLowerCase()
+      : "";
+
+
+  if(
+    message.includes("encrypted") ||
+    message.includes("password")
+  ){
+
+    return "This PDF is password-protected or encrypted. Please use an unlocked PDF.";
+
+  }
+
+
+  if(
+    message.includes("invalid") ||
+    message.includes("malformed")
+  ){
+
+    return "This PDF appears to be damaged or invalid. Please try opening it normally first, then upload it again.";
+
+  }
+
+
+  if(
+    message.includes("memory") ||
+    message.includes("out of memory")
+  ){
+
+    return "This PDF is too large or complex for your device to process. Please try a smaller PDF.";
+
+  }
+
+
+  return "Couldn't process that PDF. Please try another PDF.";
+
+}
+
+
+/* =====================================================
+   SHARE
+===================================================== */
+
+shareBtn.addEventListener(
+  "click",
+  async () => {
+
+    if(!currentObjectUrl){
+
+      showError(
+        "Tap “Apply Changes” first."
+      );
+
+      return;
+
+    }
+
+
+    clearError();
+
+
+    try{
+
+      const response =
+        await fetch(
+          currentObjectUrl
+        );
+
+
+      if(!response.ok){
+
+        throw new Error(
+          "Could not read stamped PDF."
+        );
+
+      }
+
+
+      const blob =
+        await response.blob();
+
+
+      const file =
+        new File(
+          [blob],
+          currentFileName,
+          {
+            type:"application/pdf"
+          }
+        );
+
+
+      if(
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({
+          files:[file]
+        })
+      ){
+
+        await navigator.share({
+
+          files:[file],
+
+          title:
+            currentFileName
+
+        });
+
+        return;
+
+      }
+
+
+      if(navigator.share){
+
+        await navigator.share({
+
+          title:
+            currentFileName,
+
+          text:
+            "Stamped PDF"
+
+        });
+
+        return;
+
+      }
+
+
+      showError(
+        "Sharing isn't supported in this browser. Use Download PDF instead."
+      );
+
+
+    }catch(error){
+
+      if(
+        error &&
+        error.name === "AbortError"
+      ){
+
+        return;
+
+      }
+
+
+      console.error(
+        "Share error:",
+        error
+      );
+
+
+      showError(
+        "Couldn't open the share menu. You can use Download PDF instead."
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   STAMP ANOTHER
+===================================================== */
+
+anotherBtn.addEventListener(
+  "click",
+  () => {
+
+    clearError();
+
+
+    if(currentObjectUrl){
+
+      URL.revokeObjectURL(
+        currentObjectUrl
+      );
+
+      currentObjectUrl = null;
+
+    }
+
+
+    originalPdfBytes = null;
+
+
+    resultCard.classList.add(
+      "hidden"
+    );
+
+
+    downloadBtn.classList.add(
+      "hidden"
+    );
+
+
+    applyBtn.classList.remove(
+      "hidden"
+    );
+
+
+    applyBtn.disabled = false;
+
+    applyBtn.textContent =
+      "Apply Changes";
+
+
+    hasUnappliedChanges = true;
+
+
+    watermarkSettings = {
+
+      x:0.5,
+      y:0.5,
+
+      scale:1,
+
+      rotation:35,
+
+      centered:false
+
+    };
+
+
+    footerSettings = {
+
+      x:0.94,
+      y:0.075,
+
+      scale:1,
+
+      rotation:0
+
+    };
+
+
+    selectedElement =
+      "watermark";
+
+
+    updateEditorUI();
+
+
+    showUpload();
+
+
+    uploadZone.scrollIntoView({
+      behavior:"smooth",
+      block:"center"
+    });
+
+  }
+);
+
+
+/* =====================================================
+   RESIZE PREVIEW
+===================================================== */
+
+let resizeTimer = null;
+
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    if(
+      !window.previewPage ||
+      resultCard.classList.contains(
+        "hidden"
+      )
+    ){
+
+      return;
+
+    }
+
+
+    clearTimeout(
+      resizeTimer
+    );
+
+
+    resizeTimer =
+      setTimeout(
+        () => {
+
+          drawPreviewPage()
+            .catch(error => {
+
+              console.warn(
+                "Preview resize failed:",
+                error
+              );
+
+            });
+
+        },
+        150
+      );
+
+  }
+);
+
+
+/* =====================================================
    ENTER KEY
-========================================================= */
+===================================================== */
 
 [
   wmTextInput,
@@ -1518,6 +4016,7 @@ saveSettingsBtn.addEventListener(
         event.preventDefault();
 
         saveSettingsBtn.click();
+
       }
 
     }
@@ -1526,146 +4025,9 @@ saveSettingsBtn.addEventListener(
 });
 
 
-/* =========================================================
-   PREVIEW
-========================================================= */
-
-previewBtn.addEventListener(
-  "click",
-  () => {
-
-    if(!currentObjectUrl){
-      return;
-    }
-
-    window.open(
-      currentObjectUrl,
-      "_blank"
-    );
-  }
-);
-
-
-/* =========================================================
-   SHARE
-========================================================= */
-
-shareBtn.addEventListener(
-  "click",
-  async () => {
-
-    if(!currentObjectUrl){
-      return;
-    }
-
-    clearError();
-
-    try{
-
-      const response =
-        await fetch(
-          currentObjectUrl
-        );
-
-      if(!response.ok){
-        throw new Error(
-          "Could not read stamped PDF."
-        );
-      }
-
-      const blob =
-        await response.blob();
-
-      const file =
-        new File(
-          [blob],
-          currentFileName,
-          {
-            type:"application/pdf"
-          }
-        );
-
-      if(
-        navigator.share &&
-        navigator.canShare &&
-        navigator.canShare({
-          files:[file]
-        })
-      ){
-
-        await navigator.share({
-          files:[file],
-          title:currentFileName
-        });
-
-        return;
-      }
-
-      if(navigator.share){
-
-        await navigator.share({
-          title:currentFileName,
-          text:"Stamped PDF"
-        });
-
-        return;
-      }
-
-      showError(
-        "Sharing isn't supported in this browser. Use Download PDF instead."
-      );
-
-    }catch(error){
-
-      if(
-        error &&
-        error.name === "AbortError"
-      ){
-        return;
-      }
-
-      console.error(
-        "Share error:",
-        error
-      );
-
-      showError(
-        "Couldn't open the share menu. You can use Download PDF instead."
-      );
-    }
-  }
-);
-
-
-/* =========================================================
-   STAMP ANOTHER PDF
-========================================================= */
-
-anotherBtn.addEventListener(
-  "click",
-  () => {
-
-    clearError();
-    clearCurrentResult();
-
-    /*
-      Keep the user's saved details.
-      Show only the upload step again.
-    */
-    showUpload();
-
-    uploadZone.scrollIntoView({
-      behavior:"smooth",
-      block:"center"
-    });
-
-  }
-);
-
-
-/* =========================================================
+/* =====================================================
    CLEANUP
-========================================================= */
+===================================================== */
 
 window.addEventListener(
   "beforeunload",
@@ -1683,9 +4045,9 @@ window.addEventListener(
 );
 
 
-/* =========================================================
-   START
-========================================================= */
+/* =====================================================
+   INITIALIZE
+===================================================== */
 
 loadSettings();
 
