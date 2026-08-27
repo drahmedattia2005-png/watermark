@@ -455,6 +455,62 @@ select:focus{
   display:none!important;
 }
 
+/* Keep the notebook character on iPhone without sacrificing the workspace. */
+@media (max-width:600px){
+
+  body{
+    padding-bottom:32px;
+  }
+
+  .app{
+    max-width:none;
+    padding:16px 10px 0;
+  }
+
+  header{
+    margin-bottom:14px;
+  }
+
+  header .mark{
+    font-size:30px;
+  }
+
+  .card{
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:10px;
+  }
+
+  .upload-zone{
+    border-radius:12px;
+    padding:28px 14px;
+    margin-bottom:10px;
+  }
+
+  .preview-wrap{
+    margin:10px -4px 14px;
+    border-radius:10px;
+  }
+
+  #pdfPreviewContainer{
+    padding:6px;
+  }
+
+  .preview-controls{
+    padding:12px;
+    margin-bottom:12px;
+  }
+
+  .control-label{
+    width:54px;
+  }
+
+  .btn{
+    padding:14px;
+  }
+
+}
+
 #previewCanvasWrap.export-capture .preview-element.selected{
   outline:none!important;
 }
