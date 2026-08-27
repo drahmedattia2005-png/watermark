@@ -4,370 +4,1692 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Watermark Tool</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
 <style>
-:root{--ink:#1B2A4A;--ink-soft:#4A5578;--paper:#F6F4EF;--paper-line:#E3DFD3;--gold:#B08D57;--good:#2F6B4F;--bad:#A63A3A;--radius:14px}
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);background-image:repeating-linear-gradient(var(--paper-line) 0 1px,transparent 1px 32px);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);min-height:100vh;padding:0 0 60px}
-.app{width:100%;max-width:520px;margin:auto;padding:28px 20px 0}
-header{text-align:center;margin-bottom:22px}
-header .mark{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:34px;color:var(--ink);transform:rotate(-6deg);display:inline-block;margin-bottom:2px}
-header p{margin:4px 0;color:var(--ink-soft);font-size:14px}
-.card{background:#fff;border:1px solid var(--paper-line);border-radius:var(--radius);padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(27,42,74,.06)}
-.card h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin:0 0 14px;font-weight:700}
-label.field{display:block;font-size:13px;color:var(--ink-soft);margin:14px 0 6px}
-label.field:first-of-type{margin-top:0}
-input[type=text],input[type=tel],select{width:100%;padding:13px 14px;border:1.5px solid var(--paper-line);border-radius:10px;font-size:16px;color:var(--ink);background:var(--paper)}
-input:focus,select:focus{outline:none;border-color:var(--gold)}
-.settings-summary{display:flex;justify-content:space-between;align-items:center}
-.settings-summary div{font-size:14px;line-height:1.5}
-.settings-summary b{display:block}
-.link-btn{background:none;border:0;color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;padding:6px}
-.upload-zone{display:block;position:relative;overflow:hidden;width:100%;border:2px dashed var(--paper-line);border-radius:var(--radius);padding:36px 20px;text-align:center;background:#fff;cursor:pointer;transition:border-color .15s,opacity .15s;margin-bottom:16px}
-.upload-zone.disabled{opacity:.5;cursor:not-allowed}
-.upload-zone:active{border-color:var(--gold)}
-.upload-zone .icon{font-size:30px;margin-bottom:8px}
-.upload-zone .big{font-size:17px;font-weight:700;color:var(--ink)}
-.upload-zone .small{font-size:13px;color:var(--ink-soft);margin-top:4px}
-#fileInput{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:10;font-size:16px}
-#fileInput:disabled{cursor:not-allowed}
-.btn{display:block;width:100%;padding:15px;border-radius:12px;border:0;font-size:16px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none}
-.btn-primary{background:var(--ink);color:#fff}
-.btn-share{background:var(--good);color:#fff}
-.btn-outline{background:#fff;color:var(--ink);border:1.5px solid var(--paper-line)}
-.btn-secondary{background:transparent;color:var(--ink-soft);margin-top:10px;font-weight:600;font-size:14px;padding:8px}
-.btn:disabled{opacity:.55;cursor:not-allowed}
-.status{text-align:center;padding:10px 0;font-size:14px;color:var(--ink-soft)}
-.status.error{color:var(--bad)}
-.spinner{width:22px;height:22px;border:3px solid var(--paper-line);border-top-color:var(--gold);border-radius:50%;margin:0 auto 10px;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.result{text-align:center}
-.result .check{font-size:36px;color:var(--good);margin-bottom:6px}
-.result .fname{font-size:13px;color:var(--ink-soft);margin-bottom:16px;word-break:break-all}
-.preview-wrap{border:1px solid var(--paper-line);border-radius:12px;overflow:hidden;background:#eee;margin:12px 0 16px}
-#pdfPreview{width:100%;height:420px;border:0;display:block;background:#eee}
-.preview-note{font-size:12px;color:var(--ink-soft);margin:8px 0 0}
-.button-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.hidden{display:none!important}
-@media(max-width:560px){#pdfPreview{height:360px}}
-</style>
-</head>
-<body>
-<div class="app">
-<header>
-<div class="mark">Watermark</div>
-<p>Add your stamp to any PDF, right from your phone</p>
-</header>
-
-<div class="card" id="setupCard">
-<h2>Your details</h2>
-<label class="field" for="wmText">Watermark text</label>
-<input type="text" id="wmText" placeholder="">
-<label class="field" for="watermarkFont">Watermark font</label>
-<select id="watermarkFont">
-<option value="TimesRomanItalic">Times New Roman — Italic</option>
-<option value="HelveticaOblique">Helvetica — Italic</option>
-<option value="CourierOblique">Courier — Italic</option>
-<option value="TimesRoman">Times New Roman — Regular</option>
-<option value="Helvetica">Helvetica — Regular</option>
-<option value="Courier">Courier — Regular</option>
-</select>
-<label class="field" for="footerName">Full name</label>
-<input type="text" id="footerName" placeholder="">
-<label class="field" for="footerPhone">Phone number</label>
-<input type="tel" id="footerPhone" placeholder="">
-<button class="btn btn-primary" style="margin-top:18px" id="saveSettingsBtn">Save my details</button>
-</div>
-
-<div class="card hidden" id="summaryCard">
-<div class="settings-summary">
-<div><b id="summaryName"></b><span id="summaryPhone"></span></div>
-<button class="link-btn" id="editSettingsBtn">Edit</button>
-</div>
-</div>
-
-<div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Choose a PDF">
-<div class="icon">📄</div>
-<div class="big">Tap to choose a PDF</div>
-<div class="small">Choose a PDF before or after entering your details.</div>
-<input type="file" id="fileInput" accept="application/pdf,.pdf">
-</div>
-
-<div class="card hidden" id="workingCard">
-<div class="spinner"></div>
-<div class="status" id="workingStatus">Stamping your PDF…</div>
-</div>
-
-<div class="card hidden" id="resultCard">
-<div class="result">
-<div class="check">✓</div>
-<div class="status">Preview your stamped PDF</div>
-<div class="fname" id="resultFilename"></div>
-<div class="preview-wrap">
-<iframe id="pdfPreview" title="Stamped PDF preview"></iframe>
-</div>
-<p class="preview-note">On some phones, the preview may open in the browser's built-in PDF viewer.</p>
-<div class="button-row">
-<button class="btn btn-outline" id="previewBtn" type="button">Open Preview</button>
-<button class="btn btn-share" id="shareBtn" type="button">Share PDF</button>
-</div>
-<a href="#" class="btn btn-primary" id="downloadBtn" style="margin-top:10px">Download PDF</a>
-<button class="btn btn-secondary" id="anotherBtn">Stamp another PDF</button>
-</div>
-</div>
-
-<div class="status error hidden" id="errorStatus"></div>
-<noscript><div class="status error">JavaScript must be enabled for the watermark tool to work.</div></noscript>
-</div>
-
-<script>
-const PDFLibReady=typeof PDFLib!=="undefined";
-const {PDFDocument,rgb,degrees,StandardFonts}=PDFLibReady?PDFLib:{};
-const setupCard=document.getElementById("setupCard");
-const summaryCard=document.getElementById("summaryCard");
-const uploadZone=document.getElementById("uploadZone");
-const fileInput=document.getElementById("fileInput");
-const workingCard=document.getElementById("workingCard");
-const workingStatus=document.getElementById("workingStatus");
-const resultCard=document.getElementById("resultCard");
-const errorStatus=document.getElementById("errorStatus");
-const downloadBtn=document.getElementById("downloadBtn");
-const shareBtn=document.getElementById("shareBtn");
-const previewBtn=document.getElementById("previewBtn");
-const pdfPreview=document.getElementById("pdfPreview");
-
-let settings=null;
-let pendingFile=null;
-let currentObjectUrl=null;
-let currentFileName="stamped.pdf";
-
-function showOnly(el){
-  [setupCard,summaryCard].forEach(c=>c.classList.add("hidden"));
-  el.classList.remove("hidden");
+:root{
+  --ink:#1B2A4A;
+  --ink-soft:#4A5578;
+  --paper:#F6F4EF;
+  --paper-line:#E3DFD3;
+  --gold:#B08D57;
+  --good:#2F6B4F;
+  --bad:#A63A3A;
+  --radius:14px;
 }
 
-function setUploadEnabled(enabled){
-  fileInput.disabled=false;
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+}
+
+body{
+  background:var(--paper);
+  background-image:repeating-linear-gradient(
+    var(--paper-line) 0 1px,
+    transparent 1px 32px
+  );
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  padding-bottom:60px;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+.app{
+  width:100%;
+  max-width:520px;
+  margin:auto;
+  padding:28px 20px 0;
+}
+
+header{
+  text-align:center;
+  margin-bottom:22px;
+}
+
+header .mark{
+  font-family:Georgia,"Times New Roman",serif;
+  font-style:italic;
+  font-size:34px;
+  color:var(--ink);
+  transform:rotate(-6deg);
+  display:inline-block;
+  margin-bottom:2px;
+}
+
+header p{
+  margin:4px 0;
+  color:var(--ink-soft);
+  font-size:14px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--paper-line);
+  border-radius:var(--radius);
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 1px 3px rgba(27,42,74,.06);
+}
+
+.card h2{
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--gold);
+  margin:0 0 14px;
+  font-weight:700;
+}
+
+label.field{
+  display:block;
+  font-size:13px;
+  color:var(--ink-soft);
+  margin:14px 0 6px;
+}
+
+label.field:first-of-type{
+  margin-top:0;
+}
+
+input[type=text],
+input[type=tel],
+select{
+  width:100%;
+  padding:13px 14px;
+  border:1.5px solid var(--paper-line);
+  border-radius:10px;
+  font-size:16px;
+  color:var(--ink);
+  background:var(--paper);
+}
+
+input:focus,
+select:focus{
+  outline:none;
+  border-color:var(--gold);
+}
+
+.settings-summary{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.settings-summary div{
+  font-size:14px;
+  line-height:1.5;
+  min-width:0;
+}
+
+.settings-summary b{
+  display:block;
+  word-break:break-word;
+}
+
+#summaryPhone{
+  word-break:break-word;
+}
+
+.link-btn{
+  background:none;
+  border:0;
+  color:var(--gold);
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  padding:6px;
+}
+
+.upload-zone{
+  position:relative;
+  width:100%;
+  border:2px dashed var(--paper-line);
+  border-radius:var(--radius);
+  padding:36px 20px;
+  text-align:center;
+  background:#fff;
+  cursor:pointer;
+  transition:border-color .15s,background-color .15s;
+  margin-bottom:16px;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.upload-zone:hover{
+  border-color:var(--gold);
+}
+
+.upload-zone.dragover{
+  border-color:var(--gold);
+  background:#fcfaf5;
+}
+
+.upload-zone.disabled{
+  opacity:.5;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+
+.upload-zone .icon,
+.upload-zone .big,
+.upload-zone .small{
+  pointer-events:none;
+}
+
+.upload-zone .icon{
+  font-size:30px;
+  margin-bottom:8px;
+}
+
+.upload-zone .big{
+  font-size:17px;
+  font-weight:700;
+  color:var(--ink);
+}
+
+.upload-zone .small{
+  font-size:13px;
+  color:var(--ink-soft);
+  margin-top:4px;
+}
+
+#fileInput{
+  position:absolute;
+  width:1px;
+  height:1px;
+  opacity:0;
+  pointer-events:none;
+}
+
+.btn{
+  display:block;
+  width:100%;
+  padding:15px;
+  border-radius:12px;
+  border:0;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  text-align:center;
+  text-decoration:none;
+  transition:opacity .15s,transform .05s;
+}
+
+.btn:active{
+  transform:translateY(1px);
+}
+
+.btn-primary{
+  background:var(--ink);
+  color:#fff;
+}
+
+.btn-share{
+  background:var(--good);
+  color:#fff;
+}
+
+.btn-outline{
+  background:#fff;
+  color:var(--ink);
+  border:1.5px solid var(--paper-line);
+}
+
+.btn-secondary{
+  background:transparent;
+  color:var(--ink-soft);
+  margin-top:10px;
+  font-weight:600;
+  font-size:14px;
+  padding:8px;
+}
+
+.btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.status{
+  text-align:center;
+  padding:10px 0;
+  font-size:14px;
+  color:var(--ink-soft);
+}
+
+.status.error{
+  color:var(--bad);
+}
+
+.spinner{
+  width:22px;
+  height:22px;
+  border:3px solid var(--paper-line);
+  border-top-color:var(--gold);
+  border-radius:50%;
+  margin:0 auto 10px;
+  animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+.result{
+  text-align:center;
+}
+
+.result .check{
+  font-size:36px;
+  color:var(--good);
+  margin-bottom:6px;
+}
+
+.result .fname{
+  font-size:13px;
+  color:var(--ink-soft);
+  margin-bottom:16px;
+  word-break:break-all;
+}
+
+.preview-wrap{
+  border:1px solid var(--paper-line);
+  border-radius:12px;
+  overflow:hidden;
+  background:#eee;
+  margin:12px 0 16px;
+}
+
+#pdfPreview{
+  width:100%;
+  height:420px;
+  border:0;
+  display:block;
+  background:#eee;
+}
+
+.preview-note{
+  font-size:12px;
+  color:var(--ink-soft);
+  margin:8px 0 0;
+}
+
+.button-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+@media(max-width:560px){
+  #pdfPreview{
+    height:360px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div class="mark">Watermark</div>
+  <p>Add your stamp to any PDF, right from your phone</p>
+</header>
+
+
+<!-- DETAILS -->
+<div class="card" id="setupCard">
+
+  <h2>Your details</h2>
+
+  <label class="field" for="wmText">
+    Watermark text
+  </label>
+
+  <input
+    type="text"
+    id="wmText"
+    placeholder="Enter watermark text"
+    autocomplete="off"
+  >
+
+  <label class="field" for="watermarkFont">
+    Watermark font
+  </label>
+
+  <select id="watermarkFont">
+    <option value="TimesRomanItalic">
+      Times New Roman — Italic
+    </option>
+    <option value="HelveticaOblique">
+      Helvetica — Italic
+    </option>
+    <option value="CourierOblique">
+      Courier — Italic
+    </option>
+    <option value="TimesRoman">
+      Times New Roman — Regular
+    </option>
+    <option value="Helvetica">
+      Helvetica — Regular
+    </option>
+    <option value="Courier">
+      Courier — Regular
+    </option>
+  </select>
+
+  <label class="field" for="footerName">
+    Full name
+  </label>
+
+  <input
+    type="text"
+    id="footerName"
+    placeholder="Enter your full name"
+    autocomplete="name"
+  >
+
+  <label class="field" for="footerPhone">
+    Phone number
+  </label>
+
+  <input
+    type="tel"
+    id="footerPhone"
+    placeholder="Enter your phone number"
+    autocomplete="tel"
+  >
+
+  <button
+    class="btn btn-primary"
+    style="margin-top:18px"
+    id="saveSettingsBtn"
+    type="button"
+  >
+    Save my details
+  </button>
+
+</div>
+
+
+<!-- SAVED DETAILS -->
+<div class="card hidden" id="summaryCard">
+
+  <div class="settings-summary">
+
+    <div>
+      <b id="summaryName"></b>
+      <span id="summaryPhone"></span>
+    </div>
+
+    <button
+      class="link-btn"
+      id="editSettingsBtn"
+      type="button"
+    >
+      Edit
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- PDF UPLOAD
+     This is intentionally hidden on the first screen.
+-->
+<div
+  class="upload-zone hidden"
+  id="uploadZone"
+  role="button"
+  tabindex="0"
+  aria-label="Choose a PDF"
+>
+
+  <div class="icon">📄</div>
+
+  <div class="big">
+    Tap to choose a PDF
+  </div>
+
+  <div class="small">
+    Choose a PDF to add your watermark.
+  </div>
+
+  <input
+    type="file"
+    id="fileInput"
+    accept=".pdf,application/pdf"
+  >
+
+</div>
+
+
+<!-- WORKING -->
+<div class="card hidden" id="workingCard">
+
+  <div class="spinner"></div>
+
+  <div class="status" id="workingStatus">
+    Stamping your PDF…
+  </div>
+
+</div>
+
+
+<!-- RESULT -->
+<div class="card hidden" id="resultCard">
+
+  <div class="result">
+
+    <div class="check">✓</div>
+
+    <div class="status">
+      Preview your stamped PDF
+    </div>
+
+    <div class="fname" id="resultFilename"></div>
+
+    <div class="preview-wrap">
+      <iframe
+        id="pdfPreview"
+        title="Stamped PDF preview"
+      ></iframe>
+    </div>
+
+    <p class="preview-note">
+      On some phones, the preview may open in the browser's built-in PDF viewer.
+    </p>
+
+    <div class="button-row">
+
+      <button
+        class="btn btn-outline"
+        id="previewBtn"
+        type="button"
+      >
+        Open Preview
+      </button>
+
+      <button
+        class="btn btn-share"
+        id="shareBtn"
+        type="button"
+      >
+        Share PDF
+      </button>
+
+    </div>
+
+    <a
+      href="#"
+      class="btn btn-primary"
+      id="downloadBtn"
+      style="margin-top:10px"
+      download
+    >
+      Download PDF
+    </a>
+
+    <button
+      class="btn btn-secondary"
+      id="anotherBtn"
+      type="button"
+    >
+      Stamp another PDF
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ERROR -->
+<div
+  class="status error hidden"
+  id="errorStatus"
+  role="alert"
+></div>
+
+
+<noscript>
+  <div class="status error">
+    JavaScript must be enabled for the watermark tool to work.
+  </div>
+</noscript>
+
+</div>
+
+
+<script>
+"use strict";
+
+
+/* =========================================================
+   PDF LIB
+========================================================= */
+
+const PDFLibReady = typeof PDFLib !== "undefined";
+
+const {
+  PDFDocument,
+  rgb,
+  degrees,
+  StandardFonts
+} = PDFLibReady
+  ? PDFLib
+  : {};
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const setupCard =
+  document.getElementById("setupCard");
+
+const summaryCard =
+  document.getElementById("summaryCard");
+
+const uploadZone =
+  document.getElementById("uploadZone");
+
+const fileInput =
+  document.getElementById("fileInput");
+
+const workingCard =
+  document.getElementById("workingCard");
+
+const workingStatus =
+  document.getElementById("workingStatus");
+
+const resultCard =
+  document.getElementById("resultCard");
+
+const errorStatus =
+  document.getElementById("errorStatus");
+
+const downloadBtn =
+  document.getElementById("downloadBtn");
+
+const shareBtn =
+  document.getElementById("shareBtn");
+
+const previewBtn =
+  document.getElementById("previewBtn");
+
+const pdfPreview =
+  document.getElementById("pdfPreview");
+
+const wmTextInput =
+  document.getElementById("wmText");
+
+const watermarkFontInput =
+  document.getElementById("watermarkFont");
+
+const footerNameInput =
+  document.getElementById("footerName");
+
+const footerPhoneInput =
+  document.getElementById("footerPhone");
+
+const saveSettingsBtn =
+  document.getElementById("saveSettingsBtn");
+
+const editSettingsBtn =
+  document.getElementById("editSettingsBtn");
+
+const anotherBtn =
+  document.getElementById("anotherBtn");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let settings = null;
+let currentObjectUrl = null;
+let currentFileName = "stamped.pdf";
+let isProcessing = false;
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function showError(message){
+  errorStatus.textContent = message;
+  errorStatus.classList.remove("hidden");
+}
+
+function clearError(){
+  errorStatus.textContent = "";
+  errorStatus.classList.add("hidden");
+}
+
+function showSetup(){
+  setupCard.classList.remove("hidden");
+  summaryCard.classList.add("hidden");
+
+  /*
+    IMPORTANT:
+    While entering/editing details, the upload area stays hidden.
+  */
+  uploadZone.classList.add("hidden");
+}
+
+function showUpload(){
+  setupCard.classList.add("hidden");
+  summaryCard.classList.remove("hidden");
+
+  /*
+    Only after details have been saved do we show the PDF uploader.
+  */
+  uploadZone.classList.remove("hidden");
+
+  fileInput.disabled = false;
   uploadZone.classList.remove("disabled");
 }
 
-function renderSummary(){
-  document.getElementById("summaryName").textContent=settings.footerName;
-  document.getElementById("summaryPhone").textContent=settings.footerPhone;
-  showOnly(summaryCard);
-  setUploadEnabled(true);
+function showSavedDetails(){
+  document.getElementById("summaryName").textContent =
+    settings.footerName;
+
+  document.getElementById("summaryPhone").textContent =
+    settings.footerPhone;
+
+  showUpload();
+}
+
+
+/* =========================================================
+   CLEAN RESULT
+========================================================= */
+
+function clearCurrentResult(){
+
+  resultCard.classList.add("hidden");
+
+  if(currentObjectUrl){
+    URL.revokeObjectURL(currentObjectUrl);
+    currentObjectUrl = null;
+  }
+
+  pdfPreview.removeAttribute("src");
+
+  downloadBtn.removeAttribute("href");
+  downloadBtn.removeAttribute("download");
+
+  document.getElementById(
+    "resultFilename"
+  ).textContent = "";
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+function getFormSettings(){
+
+  return {
+    wmText: wmTextInput.value.trim(),
+    watermarkFont: watermarkFontInput.value,
+    footerName: footerNameInput.value.trim(),
+    footerPhone: footerPhoneInput.value.trim()
+  };
 }
 
 function saveSettings(){
-  const wmText=document.getElementById("wmText").value.trim();
-  const footerName=document.getElementById("footerName").value.trim();
-  const footerPhone=document.getElementById("footerPhone").value.trim();
-  const watermarkFont=document.getElementById("watermarkFont").value;
 
-  if(!wmText||!footerName||!footerPhone){
-    errorStatus.textContent="Please fill in all three fields.";
-    errorStatus.classList.remove("hidden");
+  const newSettings =
+    getFormSettings();
+
+  if(
+    !newSettings.wmText ||
+    !newSettings.footerName ||
+    !newSettings.footerPhone
+  ){
+    showError(
+      "Please fill in all three fields."
+    );
     return;
   }
 
-  settings={wmText,footerName,footerPhone,watermarkFont};
-  try{localStorage.setItem("watermark-settings",JSON.stringify(settings));}catch(e){}
-  errorStatus.classList.add("hidden");
-  renderSummary();
+  clearError();
 
-  if(pendingFile){
-    const fileToProcess=pendingFile;
-    pendingFile=null;
-    handleFile(fileToProcess);
+  settings = newSettings;
+
+  try{
+
+    localStorage.setItem(
+      "watermark-settings",
+      JSON.stringify(settings)
+    );
+
+  }catch(error){
+
+    console.warn(
+      "Could not save settings:",
+      error
+    );
+
   }
+
+  /*
+    After clicking Save:
+    DETAILS DISAPPEAR
+    UPLOAD APPEARS
+  */
+  showSavedDetails();
 }
+
+
+/* =========================================================
+   LOAD SAVED SETTINGS
+========================================================= */
 
 function loadSettings(){
+
   try{
-    const saved=localStorage.getItem("watermark-settings");
-    if(saved){
-      settings=JSON.parse(saved);
-      document.getElementById("wmText").value=settings.wmText||"";
-      document.getElementById("footerName").value=settings.footerName||"";
-      document.getElementById("footerPhone").value=settings.footerPhone||"";
-      document.getElementById("watermarkFont").value=settings.watermarkFont||"TimesRomanItalic";
-      renderSummary();
+
+    const saved =
+      localStorage.getItem(
+        "watermark-settings"
+      );
+
+    if(!saved){
+
+      settings = null;
+
+      /*
+        FIRST PAGE:
+        Only Your Details.
+      */
+      showSetup();
+
       return;
     }
-  }catch(e){}
-  showOnly(setupCard);
-  setUploadEnabled(true);
+
+    const parsed =
+      JSON.parse(saved);
+
+    if(
+      !parsed ||
+      typeof parsed !== "object" ||
+      !parsed.wmText ||
+      !parsed.footerName ||
+      !parsed.footerPhone
+    ){
+
+      localStorage.removeItem(
+        "watermark-settings"
+      );
+
+      settings = null;
+      showSetup();
+
+      return;
+    }
+
+    settings = {
+      wmText: String(parsed.wmText),
+      watermarkFont:
+        parsed.watermarkFont ||
+        "TimesRomanItalic",
+      footerName: String(parsed.footerName),
+      footerPhone: String(parsed.footerPhone)
+    };
+
+    /*
+      Populate edit form.
+    */
+    wmTextInput.value =
+      settings.wmText;
+
+    watermarkFontInput.value =
+      settings.watermarkFont;
+
+    footerNameInput.value =
+      settings.footerName;
+
+    footerPhoneInput.value =
+      settings.footerPhone;
+
+    /*
+      Returning user:
+      Saved details + upload.
+    */
+    showSavedDetails();
+
+  }catch(error){
+
+    console.warn(
+      "Could not load settings:",
+      error
+    );
+
+    settings = null;
+    showSetup();
+  }
 }
 
-document.getElementById("saveSettingsBtn").addEventListener("click",saveSettings);
 
-document.getElementById("editSettingsBtn").addEventListener("click",()=>{
-  showOnly(setupCard);
-  setUploadEnabled(true);
+/* =========================================================
+   EDIT SETTINGS
+========================================================= */
+
+editSettingsBtn.addEventListener(
+  "click",
+  () => {
+
+    clearError();
+
+    /*
+      Hide upload while editing.
+    */
+    showSetup();
+
+    /*
+      Existing settings remain in the form.
+      User can change them and save.
+    */
+  }
+);
+
+
+/* =========================================================
+   OPEN FILE PICKER
+========================================================= */
+
+function openFilePicker(){
+
+  if(
+    fileInput.disabled ||
+    isProcessing
+  ){
+    return;
+  }
+
+  clearError();
+
+  fileInput.click();
+}
+
+uploadZone.addEventListener(
+  "click",
+  openFilePicker
+);
+
+uploadZone.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key === "Enter" ||
+      event.key === " "
+    ){
+
+      event.preventDefault();
+
+      openFilePicker();
+    }
+
+  }
+);
+
+
+/* =========================================================
+   DRAG + DROP
+========================================================= */
+
+["dragenter","dragover"]
+.forEach(eventName => {
+
+  uploadZone.addEventListener(
+    eventName,
+    event => {
+
+      if(
+        fileInput.disabled ||
+        isProcessing
+      ){
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      uploadZone.classList.add(
+        "dragover"
+      );
+
+    }
+  );
+
 });
 
-function handleFile(file){
-  if(!file)return;
-  if(!PDFLibReady){
-    errorStatus.textContent="The PDF engine did not load. Please refresh the page and try again.";
-    errorStatus.classList.remove("hidden");
+["dragleave","dragend"]
+.forEach(eventName => {
+
+  uploadZone.addEventListener(
+    eventName,
+    event => {
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      uploadZone.classList.remove(
+        "dragover"
+      );
+
+    }
+  );
+
+});
+
+uploadZone.addEventListener(
+  "drop",
+  event => {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    uploadZone.classList.remove(
+      "dragover"
+    );
+
+    if(
+      fileInput.disabled ||
+      isProcessing
+    ){
+      return;
+    }
+
+    const file =
+      event.dataTransfer &&
+      event.dataTransfer.files &&
+      event.dataTransfer.files[0];
+
+    if(file){
+      handleFile(file);
+    }
+
+  }
+);
+
+
+/* =========================================================
+   FILE SELECTION
+========================================================= */
+
+fileInput.addEventListener(
+  "change",
+  event => {
+
+    const file =
+      event.target.files &&
+      event.target.files[0];
+
+    /*
+      Reset input so the same PDF can be
+      selected again later.
+    */
+    fileInput.value = "";
+
+    if(file){
+      handleFile(file);
+    }
+
+  }
+);
+
+
+/* =========================================================
+   VALIDATE PDF
+========================================================= */
+
+function isPdfFile(file){
+
+  if(!file){
+    return false;
+  }
+
+  const name =
+    typeof file.name === "string"
+      ? file.name.toLowerCase()
+      : "";
+
+  return (
+    name.endsWith(".pdf") &&
+    (
+      file.type === "" ||
+      file.type === "application/pdf"
+    )
+  );
+}
+
+
+/* =========================================================
+   HANDLE PDF
+========================================================= */
+
+async function handleFile(file){
+
+  if(!file || isProcessing){
     return;
   }
-  if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf")){
-    errorStatus.textContent="That doesn't look like a PDF — please choose a PDF file.";
-    errorStatus.classList.remove("hidden");
+
+  if(!isPdfFile(file)){
+
+    showError(
+      "That doesn't look like a PDF. Please choose a PDF file."
+    );
+
     return;
   }
+
   if(!settings){
-    pendingFile=file;
-    errorStatus.textContent="PDF selected. Enter your details and tap Save my details to stamp it.";
-    errorStatus.classList.remove("hidden");
+
+    /*
+      This should never normally happen because
+      the upload area is hidden until settings exist.
+    */
+    showError(
+      "Please save your details first."
+    );
+
+    showSetup();
+
     return;
   }
 
-  errorStatus.classList.add("hidden");
-  resultCard.classList.add("hidden");
-  workingCard.classList.remove("hidden");
-  workingStatus.textContent="Stamping your PDF…";
+  /*
+    IMMEDIATELY HIDE THE UPLOAD AREA
+    AFTER A PDF HAS BEEN CHOSEN.
+  */
+  uploadZone.classList.add("hidden");
 
-  setTimeout(async()=>{
-    try{
-      const bytes=await file.arrayBuffer();
-      const stampedBytes=await stampPdf(bytes,settings);
-      const blob=new Blob([stampedBytes],{type:"application/pdf"});
-      if(currentObjectUrl)URL.revokeObjectURL(currentObjectUrl);
-      currentObjectUrl=URL.createObjectURL(blob);
-      currentFileName=file.name.replace(/\.pdf$/i,"")+" - stamped.pdf";
-
-      downloadBtn.href=currentObjectUrl;
-      downloadBtn.download=currentFileName;
-      document.getElementById("resultFilename").textContent=currentFileName;
-      pdfPreview.src=currentObjectUrl;
-
-      workingCard.classList.add("hidden");
-      resultCard.classList.remove("hidden");
-    }catch(err){
-      console.error(err);
-      workingCard.classList.add("hidden");
-      errorStatus.textContent="Couldn't stamp that PDF. Please try another PDF.";
-      errorStatus.classList.remove("hidden");
-    }
-  },50);
+  await processPdf(file);
 }
 
-fileInput.addEventListener("change",e=>{
-  const file=e.target.files&&e.target.files[0];
-  handleFile(file);
-  e.target.value="";
-});
 
-["dragenter","dragover"].forEach(evt=>{
-  uploadZone.addEventListener(evt,e=>{
-    if(fileInput.disabled)return;
-    e.preventDefault();
-    uploadZone.style.borderColor="var(--gold)";
-  });
-});
+/* =========================================================
+   PROCESS PDF
+========================================================= */
 
-["dragleave","dragend"].forEach(evt=>{
-  uploadZone.addEventListener(evt,e=>{
-    e.preventDefault();
-    uploadZone.style.borderColor="";
-  });
-});
+async function processPdf(file){
 
-uploadZone.addEventListener("drop",e=>{
-  e.preventDefault();
-  uploadZone.style.borderColor="";
-  if(fileInput.disabled)return;
-  const file=e.dataTransfer.files&&e.dataTransfer.files[0];
-  handleFile(file);
-});
+  if(!PDFLibReady){
 
-uploadZone.addEventListener("keydown",e=>{
-  if(fileInput.disabled)return;
-  if(e.key==="Enter"||e.key===" "){
-    e.preventDefault();
-    fileInput.click();
+    showError(
+      "The PDF engine did not load. Please refresh the page and try again."
+    );
+
+    uploadZone.classList.remove("hidden");
+
+    return;
   }
-});
 
-document.getElementById("anotherBtn").addEventListener("click",()=>{
-  resultCard.classList.add("hidden");
-  fileInput.value="";
-  if(currentObjectUrl){
-    URL.revokeObjectURL(currentObjectUrl);
-    currentObjectUrl=null;
-  }
-  pdfPreview.removeAttribute("src");
-});
+  isProcessing = true;
 
-previewBtn.addEventListener("click",()=>{
-  if(!currentObjectUrl)return;
-  window.open(currentObjectUrl,"_blank","noopener");
-});
+  clearError();
+  clearCurrentResult();
 
-downloadBtn.addEventListener("click",()=>{});
+  workingCard.classList.remove("hidden");
 
-shareBtn.addEventListener("click",async()=>{
-  if(!currentObjectUrl)return;
+  workingStatus.textContent =
+    "Reading your PDF…";
+
+  fileInput.disabled = true;
+
   try{
-    const response=await fetch(currentObjectUrl);
-    const blob=await response.blob();
-    const file=new File([blob],currentFileName,{type:"application/pdf"});
-    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:currentFileName});
-    }else if(navigator.share){
-      await navigator.share({title:currentFileName,text:"Stamped PDF"});
-    }else{
-      errorStatus.textContent="Sharing isn't supported in this browser. Use Download PDF instead.";
-      errorStatus.classList.remove("hidden");
+
+    await new Promise(
+      resolve => requestAnimationFrame(resolve)
+    );
+
+    workingStatus.textContent =
+      "Stamping your PDF…";
+
+    const bytes =
+      await file.arrayBuffer();
+
+    const stampedBytes =
+      await stampPdf(
+        bytes,
+        settings
+      );
+
+    const blob =
+      new Blob(
+        [stampedBytes],
+        {type:"application/pdf"}
+      );
+
+    if(currentObjectUrl){
+      URL.revokeObjectURL(
+        currentObjectUrl
+      );
     }
-  }catch(err){
-    if(err&&err.name==="AbortError")return;
-    errorStatus.textContent="Couldn't open the share menu. You can use Download PDF instead.";
-    errorStatus.classList.remove("hidden");
+
+    currentObjectUrl =
+      URL.createObjectURL(blob);
+
+    currentFileName =
+      file.name.replace(
+        /\.pdf$/i,
+        ""
+      ) +
+      " - stamped.pdf";
+
+    downloadBtn.href =
+      currentObjectUrl;
+
+    downloadBtn.download =
+      currentFileName;
+
+    document.getElementById(
+      "resultFilename"
+    ).textContent =
+      currentFileName;
+
+    pdfPreview.src =
+      currentObjectUrl;
+
+    workingCard.classList.add("hidden");
+
+    resultCard.classList.remove(
+      "hidden"
+    );
+
+  }catch(error){
+
+    console.error(
+      "PDF stamping error:",
+      error
+    );
+
+    workingCard.classList.add(
+      "hidden"
+    );
+
+    /*
+      If processing fails, allow the user
+      to choose another PDF.
+    */
+    uploadZone.classList.remove(
+      "hidden"
+    );
+
+    showError(
+      getPdfErrorMessage(error)
+    );
+
+  }finally{
+
+    isProcessing = false;
+
+    fileInput.disabled = false;
   }
-});
+}
+
+function getPdfErrorMessage(error){
+
+  const message =
+    error &&
+    typeof error.message === "string"
+      ? error.message.toLowerCase()
+      : "";
+
+  if(
+    message.includes("password") ||
+    message.includes("encrypted")
+  ){
+    return "This PDF is password-protected or encrypted. Please use an unlocked PDF.";
+  }
+
+  if(
+    message.includes("invalid") ||
+    message.includes("parse")
+  ){
+    return "This PDF appears to be damaged or unsupported. Please try another PDF.";
+  }
+
+  return "Couldn't stamp that PDF. Please make sure it is a valid PDF and try again.";
+}
+
+
+/* =========================================================
+   WATERMARK FONT
+========================================================= */
 
 function getWatermarkFont(fontKey){
-  return StandardFonts[fontKey]||StandardFonts.TimesRomanItalic;
+
+  const fontMap = {
+
+    TimesRomanItalic:
+      StandardFonts.TimesRomanItalic,
+
+    HelveticaOblique:
+      StandardFonts.HelveticaOblique,
+
+    CourierOblique:
+      StandardFonts.CourierOblique,
+
+    TimesRoman:
+      StandardFonts.TimesRoman,
+
+    Helvetica:
+      StandardFonts.Helvetica,
+
+    Courier:
+      StandardFonts.Courier
+  };
+
+  return (
+    fontMap[fontKey] ||
+    StandardFonts.TimesRomanItalic
+  );
 }
 
-async function stampPdf(arrayBuffer,s){
-  const pdfDoc=await PDFDocument.load(arrayBuffer);
-  const watermarkFont=await pdfDoc.embedFont(getWatermarkFont(s.watermarkFont));
-  const boldFont=await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const regFont=await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const pages=pdfDoc.getPages();
-  const angle=35;
-  const angleRad=angle*Math.PI/180;
+
+/* =========================================================
+   STAMP PDF
+========================================================= */
+
+async function stampPdf(
+  arrayBuffer,
+  s
+){
+
+  const pdfDoc =
+    await PDFDocument.load(
+      arrayBuffer
+    );
+
+  const watermarkFont =
+    await pdfDoc.embedFont(
+      getWatermarkFont(
+        s.watermarkFont
+      )
+    );
+
+  const boldFont =
+    await pdfDoc.embedFont(
+      StandardFonts.HelveticaBold
+    );
+
+  const regFont =
+    await pdfDoc.embedFont(
+      StandardFonts.Helvetica
+    );
+
+  const pages =
+    pdfDoc.getPages();
+
+  const angle = 35;
 
   for(const page of pages){
-    const {width,height}=page.getSize();
-    const wmFontSize=Math.min(width,height)*0.16;
-    const wmWidth=watermarkFont.widthOfTextAtSize(s.wmText,wmFontSize);
-    const cx=width/2,cy=height/2;
-    const wmX=cx-(wmWidth/2)*Math.cos(angleRad);
-    const wmY=cy-(wmWidth/2)*Math.sin(angleRad);
 
-    page.drawText(s.wmText,{x:wmX,y:wmY,size:wmFontSize,font:watermarkFont,color:rgb(.55,.55,.55),opacity:.32,rotate:degrees(angle)});
+    const {
+      width,
+      height
+    } = page.getSize();
 
-    const margin=Math.min(width,height)*.045;
-    const nameFontSize=Math.min(width,height)*.028;
-    const phoneFontSize=nameFontSize*.82;
-    const nameWidth=boldFont.widthOfTextAtSize(s.footerName,nameFontSize);
-    const phoneWidth=regFont.widthOfTextAtSize(s.footerPhone,phoneFontSize);
-    const phoneY=margin;
-    const nameY=margin+phoneFontSize+nameFontSize*.35;
+    const shortestSide =
+      Math.min(
+        width,
+        height
+      );
 
-    page.drawText(s.footerName,{x:width-margin-nameWidth,y:nameY,size:nameFontSize,font:boldFont,color:rgb(.1,.1,.1)});
-    page.drawText(s.footerPhone,{x:width-margin-phoneWidth,y:phoneY,size:phoneFontSize,font:regFont,color:rgb(.1,.1,.1)});
+    const wmFontSize =
+      Math.min(
+        shortestSide * 0.16,
+        110
+      );
+
+    const wmTextWidth =
+      watermarkFont.widthOfTextAtSize(
+        s.wmText,
+        wmFontSize
+      );
+
+    /*
+      Center the watermark more accurately.
+    */
+    const wmX =
+      (width - wmTextWidth) / 2;
+
+    const wmY =
+      height / 2 -
+      wmFontSize / 3;
+
+    page.drawText(
+      s.wmText,
+      {
+        x:wmX,
+        y:wmY,
+        size:wmFontSize,
+        font:watermarkFont,
+        color:rgb(
+          0.55,
+          0.55,
+          0.55
+        ),
+        opacity:0.32,
+        rotate:degrees(angle)
+      }
+    );
+
+
+    /* Footer */
+
+    const margin =
+      shortestSide * 0.045;
+
+    const nameFontSize =
+      Math.max(
+        8,
+        Math.min(
+          shortestSide * 0.028,
+          22
+        )
+      );
+
+    const phoneFontSize =
+      Math.max(
+        7,
+        nameFontSize * 0.82
+      );
+
+    const nameWidth =
+      boldFont.widthOfTextAtSize(
+        s.footerName,
+        nameFontSize
+      );
+
+    const phoneWidth =
+      regFont.widthOfTextAtSize(
+        s.footerPhone,
+        phoneFontSize
+      );
+
+    const phoneY =
+      margin;
+
+    const nameY =
+      margin +
+      phoneFontSize +
+      nameFontSize * 0.35;
+
+    page.drawText(
+      s.footerName,
+      {
+        x:Math.max(
+          margin,
+          width -
+          margin -
+          nameWidth
+        ),
+        y:nameY,
+        size:nameFontSize,
+        font:boldFont,
+        color:rgb(
+          0.1,
+          0.1,
+          0.1
+        )
+      }
+    );
+
+    page.drawText(
+      s.footerPhone,
+      {
+        x:Math.max(
+          margin,
+          width -
+          margin -
+          phoneWidth
+        ),
+        y:phoneY,
+        size:phoneFontSize,
+        font:regFont,
+        color:rgb(
+          0.1,
+          0.1,
+          0.1
+        )
+      }
+    );
+
   }
+
   return pdfDoc.save();
 }
 
+
+/* =========================================================
+   SAVE SETTINGS
+========================================================= */
+
+saveSettingsBtn.addEventListener(
+  "click",
+  saveSettings
+);
+
+
+/* =========================================================
+   ENTER KEY
+========================================================= */
+
+[
+  wmTextInput,
+  footerNameInput,
+  footerPhoneInput
+].forEach(input => {
+
+  input.addEventListener(
+    "keydown",
+    event => {
+
+      if(event.key === "Enter"){
+
+        event.preventDefault();
+
+        saveSettingsBtn.click();
+      }
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+previewBtn.addEventListener(
+  "click",
+  () => {
+
+    if(!currentObjectUrl){
+      return;
+    }
+
+    window.open(
+      currentObjectUrl,
+      "_blank"
+    );
+  }
+);
+
+
+/* =========================================================
+   SHARE
+========================================================= */
+
+shareBtn.addEventListener(
+  "click",
+  async () => {
+
+    if(!currentObjectUrl){
+      return;
+    }
+
+    clearError();
+
+    try{
+
+      const response =
+        await fetch(
+          currentObjectUrl
+        );
+
+      if(!response.ok){
+        throw new Error(
+          "Could not read stamped PDF."
+        );
+      }
+
+      const blob =
+        await response.blob();
+
+      const file =
+        new File(
+          [blob],
+          currentFileName,
+          {
+            type:"application/pdf"
+          }
+        );
+
+      if(
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({
+          files:[file]
+        })
+      ){
+
+        await navigator.share({
+          files:[file],
+          title:currentFileName
+        });
+
+        return;
+      }
+
+      if(navigator.share){
+
+        await navigator.share({
+          title:currentFileName,
+          text:"Stamped PDF"
+        });
+
+        return;
+      }
+
+      showError(
+        "Sharing isn't supported in this browser. Use Download PDF instead."
+      );
+
+    }catch(error){
+
+      if(
+        error &&
+        error.name === "AbortError"
+      ){
+        return;
+      }
+
+      console.error(
+        "Share error:",
+        error
+      );
+
+      showError(
+        "Couldn't open the share menu. You can use Download PDF instead."
+      );
+    }
+  }
+);
+
+
+/* =========================================================
+   STAMP ANOTHER PDF
+========================================================= */
+
+anotherBtn.addEventListener(
+  "click",
+  () => {
+
+    clearError();
+    clearCurrentResult();
+
+    /*
+      Keep the user's saved details.
+      Show only the upload step again.
+    */
+    showUpload();
+
+    uploadZone.scrollIntoView({
+      behavior:"smooth",
+      block:"center"
+    });
+
+  }
+);
+
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+window.addEventListener(
+  "beforeunload",
+  () => {
+
+    if(currentObjectUrl){
+
+      URL.revokeObjectURL(
+        currentObjectUrl
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
 loadSettings();
+
 </script>
+
 </body>
 </html>
