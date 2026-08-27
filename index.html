@@ -296,7 +296,10 @@ select:focus{
   position:relative;
   width:100%;
   overflow:hidden;
-  touch-action:none;
+  /* Let a swipe on the empty PDF page scroll the app. The draggable
+     watermark/footer each keep touch-action:none, so touching them still
+     starts a position drag. */
+  touch-action:pan-y;
 }
 
 #pdfPreviewCanvas{
