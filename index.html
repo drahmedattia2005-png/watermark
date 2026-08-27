@@ -517,6 +517,234 @@ select:focus{
 #previewCanvasWrap.export-capture .preview-element.selected{
   outline:none!important;
 }
+
+/* =====================================================
+   POLISHED PRODUCT UI
+===================================================== */
+:root{
+  --ink:#132238;
+  --ink-soft:#627187;
+  --paper:#f4f7fb;
+  --paper-line:#dce4ee;
+  --gold:#1d71c9;
+  --good:#137a62;
+  --bad:#b6404a;
+  --radius:18px;
+}
+
+body{
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(circle at 12% -8%, rgba(41,136,220,.16), transparent 31rem),
+    radial-gradient(circle at 92% 14%, rgba(42,187,163,.11), transparent 25rem),
+    linear-gradient(rgba(255,255,255,.58), rgba(255,255,255,.58));
+  letter-spacing:-.01em;
+}
+
+.app{
+  max-width:560px;
+  padding:42px 20px 24px;
+}
+
+header{
+  margin:0 auto 30px;
+  max-width:390px;
+}
+
+header .mark{
+  font-family:Georgia,"Times New Roman",serif;
+  font-style:normal;
+  font-size:34px;
+  font-weight:700;
+  letter-spacing:-.055em;
+  color:var(--ink);
+  transform:none;
+}
+
+header .mark::before{
+  content:"✦";
+  display:inline-block;
+  margin-right:9px;
+  color:var(--gold);
+  font-family:inherit;
+  font-size:21px;
+  vertical-align:6px;
+}
+
+header p{
+  margin:9px 0 0;
+  color:var(--ink-soft);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.card{
+  border:1px solid rgba(205,216,229,.86);
+  border-radius:var(--radius);
+  padding:22px;
+  margin-bottom:16px;
+  box-shadow:0 10px 30px rgba(35,67,108,.08), 0 1px 2px rgba(35,67,108,.04);
+}
+
+.card h2{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  letter-spacing:.12em;
+  color:#397fbd;
+  margin:0 0 18px;
+}
+
+.card h2::after{
+  content:"";
+  height:1px;
+  flex:1;
+  background:linear-gradient(90deg, rgba(57,127,189,.25), transparent);
+}
+
+label.field{
+  margin:17px 0 7px;
+  color:#4d5e76;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+
+input[type=text], input[type=tel], input[type=file], select{
+  padding:13px 14px;
+  border:1px solid var(--paper-line);
+  border-radius:11px;
+  background:#fbfcfe;
+  color:var(--ink);
+  box-shadow:inset 0 1px 1px rgba(20,40,65,.025);
+  transition:border-color .18s, box-shadow .18s, background .18s;
+}
+
+input[type=text]:hover, input[type=tel]:hover, input[type=file]:hover, select:hover{
+  border-color:#bdcddd;
+  background:#fff;
+}
+
+input:focus, select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 4px rgba(29,113,201,.13);
+  background:#fff;
+}
+
+input[type=file]{
+  padding:9px;
+  font-size:13px;
+}
+
+input[type=file]::file-selector-button{
+  border:0;
+  border-radius:7px;
+  padding:7px 10px;
+  margin-right:10px;
+  background:#e8f2fd;
+  color:#286ba8;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.link-btn{
+  color:#2976bb;
+  font-size:13px;
+  padding:7px 4px;
+}
+
+.link-btn:hover{ color:#165f9f; text-decoration:underline; }
+
+.upload-zone{
+  border:1.5px dashed #9ebfdc;
+  border-radius:var(--radius);
+  padding:40px 20px;
+  background:linear-gradient(135deg, rgba(255,255,255,.95), rgba(240,248,255,.95));
+  box-shadow:0 8px 26px rgba(35,67,108,.06);
+}
+
+.upload-zone:hover, .upload-zone.dragover{
+  border-color:var(--gold);
+  background:linear-gradient(135deg, #fff, #eaf5ff);
+  transform:translateY(-1px);
+}
+
+.upload-zone .icon{ font-size:34px; margin-bottom:10px; }
+.upload-zone .big{ font-size:17px; color:var(--ink); }
+.upload-zone .small{ margin-top:6px; font-size:13px; }
+
+.btn{
+  padding:15px 18px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(18,46,77,.12);
+  transition:transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+
+.btn:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 8px 18px rgba(18,46,77,.17); filter:brightness(1.025); }
+.btn:active:not(:disabled){ transform:translateY(0); box-shadow:0 3px 7px rgba(18,46,77,.12); }
+.btn:focus-visible, .editor-tab:focus-visible, .link-btn:focus-visible{ outline:3px solid rgba(29,113,201,.3); outline-offset:3px; }
+
+.btn-primary{ background:linear-gradient(135deg, #183653, #245d8f); }
+.btn-share{ background:linear-gradient(135deg, #126e5b, #169274); }
+.btn-secondary{ box-shadow:none; color:#66758a; }
+
+.editor-tabs{
+  gap:6px;
+  padding:4px;
+  border-radius:13px;
+  background:#eef3f8;
+  margin-bottom:16px;
+}
+
+.editor-tab{
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:#607087;
+  font-size:13px;
+  padding:11px 12px;
+}
+
+.editor-tab.active{
+  background:#fff;
+  border-color:#fff;
+  color:#1b5e9c;
+  box-shadow:0 2px 8px rgba(32,66,106,.12);
+}
+
+.preview-wrap{
+  border:1px solid #d9e3ec;
+  border-radius:14px;
+  background:#edf2f6;
+  box-shadow:inset 0 1px 1px rgba(29,55,88,.06);
+}
+
+.preview-controls{
+  border:1px solid #dce5ee;
+  border-radius:14px;
+  padding:16px;
+  background:#fcfdff;
+}
+
+.preview-controls-subtitle{ color:#377bb9; font-size:12px; letter-spacing:.01em; }
+.control-row{ gap:12px; margin-top:15px; }
+.control-label{ color:#5c6b80; font-size:12px; font-weight:700; }
+.control-value{ color:#29445f; font-size:12px; }
+.center-row{ border-top-color:#e5ebf1; }
+.center-title{ font-size:13px; color:#354a63; }
+.toggle-slider{ background:#cbd6e1; }
+.toggle input:checked + .toggle-slider{ background:var(--gold); }
+
+.settings-summary b{ color:var(--ink); }
+
+@media (max-width:600px){
+  .app{ padding:24px 12px 20px; }
+  header{ margin-bottom:22px; }
+  header .mark{ font-size:31px; }
+  .card{ padding:18px; border-radius:16px; }
+  .upload-zone{ padding:34px 16px; }
+}
 </style>
 </head>
 
@@ -1448,9 +1676,20 @@ function saveDetails(){
     "hidden"
   );
 
-  uploadZone.classList.remove(
-    "hidden"
-  );
+  /* While editing an open PDF, stay in the editor. The file picker is
+     only shown before a PDF is chosen or after “Stamp another PDF”. */
+  if(
+    !originalPdfBytes ||
+    resultCard.classList.contains(
+      "hidden"
+    )
+  ){
+
+    uploadZone.classList.remove(
+      "hidden"
+    );
+
+  }
 
 }
 
@@ -4318,13 +4557,132 @@ shareBtn.addEventListener(
   "click",
   async () => {
 
-    if(!currentObjectUrl){
+    /* A share action should work even when the user has not made an
+       edit or pressed Download yet. Generate the current version first. */
+    if(
+      !currentObjectUrl ||
+      hasUnsavedChanges
+    ){
 
-      showError(
-        "Tap Apply Changes first."
-      );
+      if(
+        !originalPdfBytes ||
+        !settings ||
+        processing
+      ){
 
-      return;
+        return;
+
+      }
+
+
+      processing =
+        true;
+
+      shareBtn.disabled =
+        true;
+
+      shareBtn.textContent =
+        "Preparing PDF…";
+
+      clearError();
+
+
+      try{
+
+        saveFormat();
+
+
+        if(watermark.centered){
+
+          watermark.x =
+            0.5;
+
+          watermark.y =
+            0.5;
+
+        }
+
+
+        updateWatermarkPreview();
+
+        updateFooterPreview();
+
+        await waitFrames();
+
+
+        const stamped =
+          await stampPdf(
+            originalPdfBytes,
+            settings
+          );
+
+
+        const blob =
+          new Blob(
+            [stamped],
+            {
+              type:"application/pdf"
+            }
+          );
+
+
+        if(currentObjectUrl){
+
+          URL.revokeObjectURL(
+            currentObjectUrl
+          );
+
+        }
+
+
+        currentObjectUrl =
+          URL.createObjectURL(
+            blob
+          );
+
+
+        downloadBtn.href =
+          currentObjectUrl;
+
+        downloadBtn.download =
+          currentFileName;
+
+        downloadBtn.classList.remove(
+          "hidden"
+        );
+
+        hasUnsavedChanges =
+          false;
+
+        applyBtn.classList.add(
+          "hidden"
+        );
+
+      }catch(error){
+
+        console.error(
+          "Share preparation error:",
+          error
+        );
+
+        showError(
+          "Couldn't prepare that PDF. Please try again."
+        );
+
+        return;
+
+      }finally{
+
+        processing =
+          false;
+
+        shareBtn.disabled =
+          false;
+
+        shareBtn.textContent =
+          "Share PDF";
+
+      }
 
     }
 
