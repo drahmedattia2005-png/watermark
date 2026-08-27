@@ -688,22 +688,6 @@ select:focus{
   id="resultCard"
 >
 
-  <div class="status">
-    Adjust your PDF
-  </div>
-
-  <div
-    id="resultFilename"
-    style="
-      font-size:13px;
-      color:var(--ink-soft);
-      margin-bottom:16px;
-      word-break:break-all;
-      text-align:center
-    "
-  ></div>
-
-
   <!-- TABS -->
 
   <div class="editor-tabs">
@@ -978,6 +962,11 @@ const watermarkTab =
 
 const footerTab =
   document.getElementById("footerTab");
+
+const editorTabs =
+  document.querySelector(
+    ".editor-tabs"
+  );
 
 const watermarkOverlay =
   document.getElementById("watermarkOverlay");
@@ -1435,6 +1424,20 @@ function saveDetails(){
 
 
   updateDetailsSummary();
+
+
+  if(
+    originalPdfBytes &&
+    !resultCard.classList.contains(
+      "hidden"
+    )
+  ){
+
+    updateEditorUI();
+
+    markChanged();
+
+  }
 
 
   setupCard.classList.add(
@@ -2020,12 +2023,6 @@ async function handleFile(file){
     );
 
 
-    document.getElementById(
-      "resultFilename"
-    ).textContent =
-      currentFileName;
-
-
     updateEditorUI();
 
 
@@ -2151,6 +2148,22 @@ footerTab.addEventListener(
 
 function updateEditorUI(){
 
+  const hasFooterImage =
+    Boolean(
+      settings?.footerImage
+    );
+
+
+  if(
+    !hasFooterImage &&
+    selectedElement === "footer"
+  ){
+
+    selectedElement =
+      "watermark";
+
+  }
+
   const current =
     selectedElement === "watermark"
       ? watermark
@@ -2166,6 +2179,12 @@ function updateEditorUI(){
   footerTab.classList.toggle(
     "active",
     selectedElement === "footer"
+  );
+
+
+  editorTabs.classList.toggle(
+    "hidden",
+    !hasFooterImage
   );
 
 
@@ -2649,6 +2668,7 @@ function markChanged(){
   applyBtn.classList.remove(
     "hidden"
   );
+
 
   applyBtn.textContent =
     "Apply Changes";
