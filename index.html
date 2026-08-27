@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Watermark Tool</title>
+<title>For Dr.Esraa</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -745,6 +745,97 @@ input[type=file]::file-selector-button{
   .card{ padding:18px; border-radius:16px; }
   .upload-zone{ padding:34px 16px; }
 }
+
+/* English-teacher theme: warm paper, fountain-pen ink, and a restrained
+   classroom detail—kept separate from the document-processing code. */
+:root{
+  --ink:#26364d;
+  --ink-soft:#6d7180;
+  --paper:#f8f2e7;
+  --paper-line:#e2d6c1;
+  --gold:#a8443b;
+  --good:#38745f;
+  --bad:#b33632;
+}
+
+body{
+  background-color:#f8f2e7;
+  background-image:
+    linear-gradient(90deg, transparent 0 38px, rgba(168,68,59,.13) 38px 39px, transparent 39px),
+    repeating-linear-gradient(to bottom, transparent 0 31px, rgba(118,144,174,.14) 31px 32px);
+}
+
+header .mark{
+  color:#26364d;
+  font-family:Georgia,"Times New Roman",serif;
+  font-style:italic;
+  letter-spacing:-.045em;
+}
+
+header .mark::before{
+  content:"🍎";
+  margin-right:8px;
+  color:initial;
+  font-family:initial;
+  font-size:21px;
+  vertical-align:3px;
+}
+
+.card{
+  border-color:#e2d6c1;
+  box-shadow:0 8px 24px rgba(61,47,31,.075), 0 1px 2px rgba(61,47,31,.05);
+}
+
+.card h2,
+.preview-controls-subtitle{ color:#a8443b; }
+
+.card h2::after{ background:linear-gradient(90deg, rgba(168,68,59,.27), transparent); }
+
+input[type=text], input[type=tel], input[type=file], select{
+  background:#fffdf9;
+  border-color:#dfd3c0;
+}
+
+input:focus, select:focus{
+  border-color:#a8443b;
+  box-shadow:0 0 0 4px rgba(168,68,59,.13);
+}
+
+input[type=file]::file-selector-button{
+  background:#f6e6dc;
+  color:#914038;
+}
+
+.link-btn{ color:#a8443b; }
+.link-btn:hover{ color:#7d302a; }
+
+.upload-zone{
+  border-color:#c9ad93;
+  background:linear-gradient(135deg, rgba(255,255,255,.96), rgba(251,245,235,.96));
+}
+
+.upload-zone:hover, .upload-zone.dragover{
+  border-color:#a8443b;
+  background:linear-gradient(135deg, #fffdf9, #f8eadf);
+}
+
+.upload-zone .icon::after{
+  content:"  A+";
+  color:#a8443b;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:17px;
+  font-style:italic;
+  font-weight:700;
+  vertical-align:8px;
+}
+
+.btn-primary{ background:linear-gradient(135deg, #293b54, #405b7d); }
+.btn-share{ background:linear-gradient(135deg, #38745f, #4d8a73); }
+.editor-tabs{ background:#f2e9dc; }
+.editor-tab.active{ color:#8d3b33; }
+.preview-wrap{ border-color:#d9cbb8; background:#e8e0d5; }
+.preview-controls{ border-color:#e0d3c1; background:#fffdf9; }
+.toggle input:checked + .toggle-slider{ background:#a8443b; }
 </style>
 </head>
 
@@ -753,7 +844,7 @@ input[type=file]::file-selector-button{
 <div class="app">
 
 <header>
-  <div class="mark">Watermark</div>
+  <div class="mark">For Dr.Esraa</div>
   <p>Add your stamp to any PDF, right from your phone</p>
 </header>
 
