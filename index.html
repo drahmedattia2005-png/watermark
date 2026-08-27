@@ -23,13 +23,13 @@ input:focus{outline:none;border-color:var(--gold)}
 .settings-summary div{font-size:14px;line-height:1.5}
 .settings-summary b{display:block}
 .link-btn{background:none;border:0;color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;padding:6px}
-.upload-zone{display:block;position:relative;width:100%;border:0;font:inherit;color:inherit;border:2px dashed var(--paper-line);border-radius:var(--radius);padding:36px 20px;text-align:center;background:#fff;cursor:pointer;transition:border-color .15s}
+.upload-zone{display:block;position:relative;overflow:hidden;width:100%;border:0;font:inherit;color:inherit;border:2px dashed var(--paper-line);border-radius:var(--radius);padding:36px 20px;text-align:center;background:#fff;cursor:pointer;transition:border-color .15s}
 .upload-zone.disabled{opacity:.5}
 .upload-zone:active{border-color:var(--gold)}
 .upload-zone .icon{font-size:30px;margin-bottom:8px}
 .upload-zone .big{font-size:17px;font-weight:700;color:var(--ink)}
 .upload-zone .small{font-size:13px;color:var(--ink-soft);margin-top:4px}
-#fileInput{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10}
+#fileInput{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:10;font-size:16px}
 .btn{display:block;width:100%;padding:15px;border-radius:12px;border:0;font-size:16px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none}
 .btn-primary{background:var(--ink);color:#fff}
 .btn-secondary{background:transparent;color:var(--ink-soft);margin-top:10px;font-weight:600;font-size:14px;padding:8px}
@@ -68,7 +68,7 @@ input:focus{outline:none;border-color:var(--gold)}
 </div>
 </div>
 
-<div class="upload-zone disabled" id="uploadZone" role="button" tabindex="0" aria-label="Choose a PDF">
+<div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Choose a PDF">
 <div class="icon">📄</div>
 <div class="big">Tap to choose a PDF</div>
 <div class="small">Choose a PDF and it will be stamped automatically.</div>
@@ -120,7 +120,6 @@ function renderSummary(){
   document.getElementById("summaryPhone").textContent=settings.footerPhone;
   showOnly(summaryCard);
   uploadZone.classList.remove("disabled");
-  fileInput.disabled=false;
 }
 
 function saveSettings(){
@@ -144,7 +143,6 @@ function saveSettings(){
   renderSummary();
 }
 
-fileInput.disabled=true;
 
 function loadSettings(){
   try{
@@ -165,8 +163,7 @@ document.getElementById("saveSettingsBtn").addEventListener("click",saveSettings
 
 document.getElementById("editSettingsBtn").addEventListener("click",()=>{
   showOnly(setupCard);
-  uploadZone.classList.add("disabled");
-  fileInput.disabled=true;
+
 });
 
 function handleFile(file){
