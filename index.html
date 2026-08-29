@@ -183,10 +183,12 @@ select:focus{
 
 #fileInput{
   position:absolute;
-  width:1px;
-  height:1px;
+  inset:0;
+  width:100%;
+  height:100%;
   opacity:0;
-  pointer-events:none;
+  cursor:pointer;
+  z-index:1;
 }
 
 .btn{
@@ -2121,7 +2123,19 @@ editSettingsBtn.addEventListener(
    FILE PICKER
 ===================================================== */
 
-function chooseFile(){
+function chooseFile(event){
+
+  /* On newer iOS Safari builds, a programmatic click on a hidden file
+     input can be ignored. Taps now land on the native input itself; do
+     not trigger a second synthetic click when that event bubbles here. */
+  if(
+    event?.target ===
+    fileInput
+  ){
+
+    return;
+
+  }
 
   if(processing){
 
